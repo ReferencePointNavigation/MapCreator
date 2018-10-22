@@ -1,0 +1,70 @@
+{
+  "minCoordinates": {
+    "x": 258165.82391357422,
+    "y": 4380416.106689453
+  },
+  "maxCoordinates": {
+    "x": 258258.82232666016,
+    "y": 4380490.313720703
+  },
+  "name": "scrugham_engineering_mines",
+  "floors": [
+    {
+      "number": 4,
+      "landmarks": [
+        {
+          "location": {
+            "x": 258174.674,
+            "y": 4380420.857
+          },
+          "name": "401",
+          "type": "DOOR",
+          "particles": [
+           {
+              "x": 258174.73910978803,
+              "y": 4380420.852380436
+            }
+          ]
+        }
+      ],
+      "navigableSpaces": [
+        {
+          "outerBoundary": [
+            {
+              "x": 258172.102,
+              "y": 4380442.812
+            }
+          ],
+          "rings": [
+            {
+              "polygon": [
+                {
+                  "x": 258313.516,
+                  "y": 4380358.74
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "minimap": {
+        "sideSize": 1.0,
+        "rows": 37,
+        "columns": 11,
+        "minCoordinates": {
+          "x": 258167.024,
+          "y": 4380419.28
+        },
+        "tiles": [
+          {
+            "row": 36,
+            "column": 4,
+            "landmarks": [
+              0
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

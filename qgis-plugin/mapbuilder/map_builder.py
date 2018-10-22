@@ -52,9 +52,7 @@ class MapBuilder:
         """
         # Save reference to the QGIS interface
         self.iface = iface
-        
-        self._add_path_to_dependencies_to_syspath()
-        
+                
         # initialize plugin directory
         self.plugin_dir = os.path.dirname(__file__)
         # initialize locale
@@ -211,6 +209,3 @@ class MapBuilder:
         f = QFileDialog.getOpenFileName(qfd, title, "~")
         parseProtobuf(f[0])
 
-    @staticmethod
-    def _add_path_to_dependencies_to_syspath():
-        pass
