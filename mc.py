@@ -1,8 +1,13 @@
-import sys
+import sys, os
+import argparse
 
 from google.protobuf.json_format import MessageToJson, Parse
 
-import BuildingMapProto_pb2
+protos_path = os.path.join(os.path.dirname(__file__), 'proto')
+if protos_path not in sys.path:
+    sys.path.append(protos_path)
+
+from proto import BuildingMapProto_pb2
 
 
 def pbToJson(filename, map):
@@ -24,6 +29,17 @@ def jsonToPB(filename, map):
 
 
 if __name__== "__main__":
+
+	parser = argparse.ArgumentParser(description
+		='Convert InvisiSign Maps between JSON and Protocol Buffer binary format')
+	
+	parser.add_argument('filename', metavar='FILE', type=str, nargs='+',
+						help='a File to process')
+
+
+	args = parser.parse_args()	
+	
+	
 	filename = sys.argv[1:][0]
 		
 	map = BuildingMapProto_pb2.BuildingMap()
