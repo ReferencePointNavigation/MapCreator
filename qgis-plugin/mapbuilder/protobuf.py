@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import sys, random
+import sys, random, math
 
 from shapely import Polygon, box
 from .BuildingMapProto_pb2 import BuildingMapProto_pb2 as BuildingMapProto
@@ -48,7 +48,7 @@ def generateParticles(map):
 	return mapBuilder
 
 	
-def generateMinimap(map, tile_size):
+def generateMinimap(map, tileSize):
 	mapBuilder = BuildingMapProto.BuildingMap.MergeFrom(map)
 	mapBuilder.clearFloors()
 	for floor in map.floors:
@@ -66,9 +66,40 @@ def generateMinimap(map, tile_size):
 					maxY = vertex.y
 				if vertex.y < minY:
 					minY = vertex.y
-		rows = 
-				
-		
+		rows = max(math.ceil((maxX - minY) / tileSize), 0)
+		columns = max(math.ceil(maxX - minX) / tileSize), 0)
+		landmarks = floor.landmarks
+		minimapBuilder = Minimap()
+		minimapBuilder.columns = columns
+		minimapBuilder.rows = rows
+		minimapBuilder.sideSize = tileSize
+		minimapBuilder.minCoordinates = Coordinates(minX, minY)
+		navigableArea = createAccessibleArea(floor.navigableSpaces)
+		currY = minY
+		for i in range(0,rows):
+			currX = minX
+			for column in range(0,columns)
+				tile = box(currX, currY, )
+				if navigableArea.intersects(tile):
+					tileBuilder = Tile()
+					tileBuilder.row = row
+					tileBuilder.column = column
+					for ty in LandmarkType:
+						tileBuilder.addAllLandmarks(
+							findClosestLandmark(
+								NUM_OF_MINIMAP_TILE_LANDMARKS,
+								landmarks,
+								navigableArea,
+								ty, tile)
+							)
+					minimapBuilder.addTiles(tileBuilder)
+				currX += tileSize
+			currY += tileSize
+		nfloor = Floor()
+		nlfoor.miniMap = minimapBuilder
+		mapBuilder.addFloors(nfloor)
 	
+	
+
 def process(map):
 	return generateMinimap(generateParticles(map), TILE_SIZE)
