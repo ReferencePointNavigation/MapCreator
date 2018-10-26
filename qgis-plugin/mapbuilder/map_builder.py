@@ -36,7 +36,8 @@ import os.path
 protos_path = os.path.join(os.path.dirname(__file__), 'proto')
 if protos_path not in sys.path:
     sys.path.append(protos_path)
-from .proto import parseProtobuf
+
+from .proto_import import parseProtobuf
 
 
 class MapBuilder:
@@ -179,6 +180,12 @@ class MapBuilder:
             callback=self.openImport,
             parent=self.iface.mainWindow())
 
+        self.add_action(
+            icon_path,
+            text=self.tr(u'Export InvisiSign Map'),
+            callback=self.openExport,
+            parent=self.iface.mainWindow())
+
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
@@ -207,5 +214,8 @@ class MapBuilder:
         qfd = QFileDialog()
         title = 'Open File'
         f = QFileDialog.getOpenFileName(qfd, title, "~")
-        parseProtobuf(f[0])
+        if len(f) > 2:
+            parseProtobuf(f[0])
 
+    def openExport(self):
+        pass

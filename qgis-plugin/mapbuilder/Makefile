@@ -45,7 +45,9 @@ PLUGINNAME = map_builder
 PY_FILES = \
 	__init__.py \
 	map_builder.py \
-	map_builder_dialog.py
+	map_builder_dialog.py \
+	proto_import.py \
+	proto_export.py
 
 PROTO_FILES = \
 	proto/BuildingMapProto_pb2.py \
