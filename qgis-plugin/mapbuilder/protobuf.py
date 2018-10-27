@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import sys, random, math
+import heapq
 
 from shapely import Polygon, box
 from .BuildingMapProto_pb2 import BuildingMapProto_pb2 as BuildingMapProto
@@ -11,7 +12,42 @@ NUM_OF_MINIMAP_TILE_LANDMARKS = 5
 MAX_LANDMARK_DISTANCE = 20.0
 NUM_OF_PARTICLES_PER_LANDMARK = 10
 
+def isAccessible(line, navigableArea):
+	if !navigableArea.contains(line.P1) or !navigableArea.contains(line.P2):
+		return False
+	start = None
+	point1 = None
+	point2 = None
+	
+	for pi in navigableArea:
+		coordinates = []
+		if ...
+		
+	return True
+		
 
+def findClosestLandmark(k, landmarks, navigableArea, ty, tile):
+	comparator = LandmarkComparator()
+	orderedLandmarks = []
+	heapq.heapify(orderedLandmarks)
+	index = 0
+	tileArea = tile
+	tileArea.intersect(navigableArea)
+	for landmark in landmarks:
+		if landmark.type = ty:
+			distance = tile.centroid.distance(landmark.centroid)
+			for pi in...
+				coordinates = []
+				if pi.currentSegment() != ...
+					orderedLandmark = [distance, index]
+					orderedLandmarks.append(orederedLandmark)
+					break
+		index += 1
+	size = min(len(orderedLandmarks),k)
+	kClosestLandmarks = []
+	for i in range(0, size):
+		kClosestLandmarks.append(heapq.heappop(orderedLandmarks)[1])
+	return kClosestLandmarks
 
 def generateParticles(map):	
 	mapBuilder = BuildingMapProto.BuildingMap.MergeFrom(map)
@@ -99,6 +135,32 @@ def generateMinimap(map, tileSize):
 		nlfoor.miniMap = minimapBuilder
 		mapBuilder.addFloors(nfloor)
 	
+def createAccessibleArea(navigableSpaces):
+	for space in navigableSpaces:
+		rings = space.rings
+		outerBoundary = space.outerBoundary
+		first = True
+		for vertex in outerBoundary:
+			if first:
+				navigableSpace.moveTo				
+				first = False
+			else:
+				navigableSpace.lineTo
+		if(navigableSpace.currentPoint):
+			navigableSpace.closepath
+		for ring in rings:
+			first = True
+			for vertex in ring.polygon:
+				if first:
+					navigableSpace.moveTo
+				else
+					navigableSpace.lineTo
+				navigableSpace.closePath
+		
+		return navigableSpace
+
+
+		
 	
 
 def process(map):
