@@ -38,7 +38,7 @@ if protos_path not in sys.path:
     sys.path.append(protos_path)
 
 from .proto_import import parseProtobuf
-
+from .proto_export import exportMap
 
 class MapBuilder:
     """QGIS Plugin Implementation."""
@@ -214,8 +214,12 @@ class MapBuilder:
         qfd = QFileDialog()
         title = 'Open File'
         f = QFileDialog.getOpenFileName(qfd, title, "~")
-        if len(f) > 2:
+        if len(f[0]) > 2:
             parseProtobuf(f[0])
 
     def openExport(self):
-        pass
+        qfd = QFileDialog()
+        title = 'Open File'
+        f = QFileDialog.getSaveFileName(qfd, title, "Untitled")
+        if len(f[0]) > 2:
+            exportMap(f[0])
