@@ -51,10 +51,23 @@ def parseLandmark(landmark, layers):
 def newLayers(name):
 	
 	fields = 'field=name:string(25)'
+	
+	base_fields = [
+		'name:string(25)',
+		'level:int()',
+		'indoor:string(25)',
+	]
+
+	point_fields = base_fields + [
+		'type:string(12)',
+		'wheelchair:string(25)',
+		'amenity:string(25)',
+		'access:string(25)'
+	]
+	
 	layers = {
 		"point" : QgsVectorLayer('Point?crs=epsg:26911&'+fields, name , "memory"),
 		"polygon" : QgsVectorLayer('Polygon?crs=epsg:26911&'+fields, name , "memory"),
-		"polyline" : QgsVectorLayer('LineString?crs=epsg:26911&'+fields, name , "memory")
 	}
 	return layers
 
