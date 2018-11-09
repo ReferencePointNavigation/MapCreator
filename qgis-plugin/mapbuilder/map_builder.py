@@ -25,7 +25,9 @@ import os, sys
 
 from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QAction, QFileDialog
+from PyQt5.QtWidgets import QAction, QFileDialog, QDialog
+
+from qgis.core import QgsVectorLayer, QgsProject
 
 # Initialize Qt resources from file resources.py
 from .resources import *
@@ -38,7 +40,7 @@ if protos_path not in sys.path:
     sys.path.append(protos_path)
 
 from .proto_import import parseProtobuf
-from .proto_export import exportMap
+from .proto_export import NavatarMap
 
 class MapBuilder:
     """QGIS Plugin Implementation."""
@@ -219,7 +221,10 @@ class MapBuilder:
 
     def openExport(self):
         qfd = QFileDialog()
-        title = 'Open File'
-        f = QFileDialog.getSaveFileName(qfd, title, "Untitled")
-        if len(f[0]) > 2:
-            exportMap(f[0])
+        qfd.setFileMode(QFileDialog.DirectoryOnly)
+        title = 'Select Directory'
+        #f = QFileDialog.getExistingDirectory(qfd, "Select Directory")
+        if qfd.exec_() == QDialog.Accepted:
+            layers = [layer for name, layer in QgsProject.instance().mapLayers().items() if type(layer) == QgsVectorLayer]
+            exporter = NavatarMap()
+            exporter.export_map(layers, qfd.selectedFiles()[0])
