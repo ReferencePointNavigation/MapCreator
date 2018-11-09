@@ -67,7 +67,7 @@ def newLayers(name):
 	
 	layers = {
 		"point" : QgsVectorLayer('Point?crs=epsg:3857&field='+'&field='.join(point_fields), name , "memory"),
-		"polygon" : QgsVectorLayer('Polygon?crs=epsg:3857&'+fields, name , "memory"),
+		"polygon" : QgsVectorLayer('Polygon?crs=epsg:3857&field='+'&field='.join(base_fields), name , "memory"),
 	}
 	return layers
 
