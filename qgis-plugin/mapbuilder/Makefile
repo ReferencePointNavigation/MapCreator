@@ -60,7 +60,7 @@ PROTO_FILES = \
 
 UI_FILES = map_builder_dialog_base.ui
 
-EXTRAS = metadata.txt icon.png
+EXTRAS = metadata.txt icon.png export.png import.png
 
 EXTRA_DIRS =
 

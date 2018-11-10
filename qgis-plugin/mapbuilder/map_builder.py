@@ -25,7 +25,7 @@ import os, sys
 
 from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QAction, QFileDialog, QDialog
+from PyQt5.QtWidgets import QAction, QFileDialog, QDialog, QToolButton, QMenu
 
 from qgis.core import QgsVectorLayer, QgsProject
 
@@ -177,17 +177,26 @@ class MapBuilder:
         icon_path = ':/plugins/map_builder/icon.png'
  
         self.add_action(
-            icon_path,
+            ':/plugins/map_builder/import.png',
             text=self.tr(u'Import InvisiSign Map'),
             callback=self.openImport,
             parent=self.iface.mainWindow())
 
         self.add_action(
-            icon_path,
+            ':/plugins/map_builder/export.png',
             text=self.tr(u'Export InvisiSign Map'),
             callback=self.openExport,
             parent=self.iface.mainWindow())
 
+        menu = QMenu()
+        icon = QIcon(icon_path)
+        menu.addAction(QAction(icon, self.tr(u'Show Level'), self.iface.mainWindow()))
+
+        tool_button = QToolButton(self.iface.mainWindow())
+        tool_button.setMenu(menu)
+        tool_button.setIcon(icon)
+        tool_button.setPopupMode(QToolButton.InstantPopup)
+        self.toolbar.addWidget(tool_button)
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
@@ -223,7 +232,6 @@ class MapBuilder:
         qfd = QFileDialog()
         qfd.setFileMode(QFileDialog.DirectoryOnly)
         title = 'Select Directory'
-        #f = QFileDialog.getExistingDirectory(qfd, "Select Directory")
         if qfd.exec_() == QDialog.Accepted:
             layers = [layer for name, layer in QgsProject.instance().mapLayers().items() if type(layer) == QgsVectorLayer]
             exporter = NavatarMap()

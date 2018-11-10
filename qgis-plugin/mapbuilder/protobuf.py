@@ -49,10 +49,10 @@ def findClosestLandmark(k, landmarks, navigableArea, ty, tile):
 		kClosestLandmarks.append(heapq.heappop(orderedLandmarks)[1])
 	return kClosestLandmarks
 
-def generateParticles(map):	
-	mapBuilder = BuildingMapProto.BuildingMap.MergeFrom(map)
+def generateParticles(buildingMap):	
+	mapBuilder = BuildingMapProto.BuildingMap.MergeFrom(buildingMap)
 	mapBuilder.clearFloors()
-	for floor in map.floors:
+	for floor in buildingMap.floors:
 		floorBuilder = FloorProto.Floor.MergeFrom(floor)
 		floorBuilder.clearLandmarks()
 		navigableArea = createAccessibleArea(floor.navigableSpaces)
@@ -84,10 +84,10 @@ def generateParticles(map):
 	return mapBuilder
 
 	
-def generateMinimap(map, tileSize):
-	mapBuilder = BuildingMapProto.BuildingMap.MergeFrom(map)
+def generateMinimap(buildingMap, tileSize):
+	mapBuilder = BuildingMapProto.BuildingMap.MergeFrom(buildingMap)
 	mapBuilder.clearFloors()
-	for floor in map.floors:
+	for floor in buildingMap.floors:
 		minX = sys.float_info.max
 		minY = sys.float_info.max
 		maxX = float('-Infinity')
@@ -163,5 +163,8 @@ def createAccessibleArea(navigableSpaces):
 		
 	
 
-def process(map):
-	return generateMinimap(generateParticles(map), TILE_SIZE)
+def process(buildingMap):
+	
+	particleMap = generateParticles(buildingMap)
+	
+	return generateMinimap(particleMap, TILE_SIZE)
