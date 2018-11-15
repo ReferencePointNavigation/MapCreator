@@ -1,5 +1,10 @@
 <RCC>
     <qresource prefix="/plugins/map_builder" >
-        <file>icon.png</file>
+        <file>resources/icon.png</file>
+        <file>resources/export.svg</file>
+        <file>resources/import.svg</file>
+        <file>resources/floors.svg</file>
+        <file>resources/floor.svg</file>
+        <file>resources/landmark.svg</file>
     </qresource>
 </RCC>

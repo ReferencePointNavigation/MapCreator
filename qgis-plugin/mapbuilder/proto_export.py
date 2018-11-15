@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
+import random
+
 from .proto import BuildingMapProto_pb2
+
 from qgis.core import (
 	QgsVectorLayer, QgsProject, QgsFeature, QgsGeometry, QgsPointXY,
 	QgsPolygon, QgsWkbTypes, QgsFeatureRequest, QgsMessageLog
@@ -109,3 +112,4 @@ class NavatarMap:
 			landmark.type = 3		
 		elif feature['type'] == 'ELEVATOR':
 			landmark.type = 4
+

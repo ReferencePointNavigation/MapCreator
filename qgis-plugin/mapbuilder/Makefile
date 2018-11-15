@@ -60,7 +60,13 @@ PROTO_FILES = \
 
 UI_FILES = map_builder_dialog_base.ui
 
-EXTRAS = metadata.txt icon.png export.png import.png
+EXTRAS = metadata.txt 
+
+RESOURCES = \
+	resources/icon.png \
+	resources/export.svg \
+	resources/import.svg \
+	resources/floors.svg
 
 EXTRA_DIRS =
 
@@ -119,11 +125,13 @@ deploy: compile doc transcompile
 	# $HOME/$(QGISDIR)/python/plugins
 	mkdir -p $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)
 	mkdir -p $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/proto
+	mkdir -p $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/resources
 	cp -vf $(PY_FILES) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)
 	cp -vf $(UI_FILES) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)
 	cp -vf $(PROTO_FILES) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/proto
 	cp -vf $(COMPILED_RESOURCE_FILES) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)
 	cp -vf $(EXTRAS) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)
+	cp -vf $(RESOURCES) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/resources
 	cp -vfr i18n $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)
 	cp -vfr $(HELP) $(HOME)/$(QGISDIR)/python/plugins/$(PLUGINNAME)/help
 	# Copy extra directories if any

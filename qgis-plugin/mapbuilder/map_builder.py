@@ -25,9 +25,9 @@ import os, sys
 
 from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QAction, QFileDialog, QDialog, QToolButton, QMenu
+from PyQt5.QtWidgets import QAction, QActionGroup, QFileDialog, QDialog, QToolButton, QMenu
 
-from qgis.core import QgsVectorLayer, QgsProject
+from qgis.core import QgsVectorLayer, QgsProject, QgsFeatureRequest
 
 # Initialize Qt resources from file resources.py
 from .resources import *
@@ -72,13 +72,9 @@ class MapBuilder:
             if qVersion() > '4.3.3':
                 QCoreApplication.installTranslator(self.translator)
 
-        # Create the dialog (after translation) and keep reference
-        # self.dlg = MapBuilderDialog()
-
         # Declare instance attributes
         self.actions = []
         self.menu = self.tr(u'&Invisign Map Builder')
-        # TODO: We are going to let the user set this up in a future iteration
         self.toolbar = self.iface.addToolBar(u'MapBuilder')
         self.toolbar.setObjectName(u'MapBuilder')
 
@@ -174,31 +170,91 @@ class MapBuilder:
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
-        icon_path = ':/plugins/map_builder/icon.png'
- 
         self.add_action(
-            ':/plugins/map_builder/import.png',
-            text=self.tr(u'Import InvisiSign Map'),
+            ':/plugins/map_builder/resources/import.svg',
+            text=self.tr(u'Import Navatar Map'),
             callback=self.openImport,
             parent=self.iface.mainWindow())
 
         self.add_action(
-            ':/plugins/map_builder/export.png',
-            text=self.tr(u'Export InvisiSign Map'),
+            ':/plugins/map_builder/resources/export.svg',
+            text=self.tr(u'Export Navatar Map'),
             callback=self.openExport,
             parent=self.iface.mainWindow())
 
-        menu = QMenu()
-        icon = QIcon(icon_path)
-        menu.addAction(QAction(icon, self.tr(u'Show Level'), self.iface.mainWindow()))
+        self.show_all_action = QAction('Show all', self.iface.mainWindow())
+        self.show_all_action.setCheckable(True)
+        self.show_all_action.triggered.connect(lambda b: self.iface.activeLayer().setSubsetString(None))
 
-        tool_button = QToolButton(self.iface.mainWindow())
-        tool_button.setMenu(menu)
-        tool_button.setIcon(icon)
-        tool_button.setPopupMode(QToolButton.InstantPopup)
-        self.toolbar.addWidget(tool_button)
+        self.setUpLevelMenu()
+
+        """
+        self.add_action(
+            ':/plugins/map_builder/resources/floor.svg',
+            text=self.tr(u'Add Navigable Space'),
+            callback=self.openExport,
+            parent=self.iface.mainWindow())
+
+        self.add_action(
+            ':/plugins/map_builder/resources/landmark.svg',
+            text=self.tr(u'Add Landmark'),
+            callback=self.openExport,
+            parent=self.iface.mainWindow())
+        """
+        
+    def setUpLevelMenu(self):
+        self.level_menu = QMenu()
+        icon = QIcon(':/plugins/map_builder/resources/floors.svg')
+        self.iface.currentLayerChanged.connect(self.layerChanged)
+        self.level_menu_button = QToolButton(self.iface.mainWindow())
+        self.level_menu_button.setMenu(self.level_menu)
+        self.level_menu_button.setIcon(icon)
+        self.level_menu_button.setPopupMode(QToolButton.InstantPopup)
+        self.buildLevelMenu()
+        self.toolbar.addWidget(self.level_menu_button)
+
+    def layerChanged(self, layer):
+        self.level_menu.clear()
+        if layer not in self.level_data:
+            self.level_menu_button.setEnabled(False)
+            return
+        self.level_menu_button.setEnabled(True)
+        for action in self.level_data[layer].actions():
+            self.level_menu.addAction(action)
+        self.level_menu.addAction(self.show_all_action)
+        self.level_data[layer].addAction(self.show_all_action)
+
+
+    def buildLevelMenu(self):
+        layers = [layer for name, layer in QgsProject.instance().mapLayers().items() if type(layer) == QgsVectorLayer]
+        self.level_data = {}
+        for layer in layers:
+            layer.setSubsetString(None)
+            levels = self.buildLevelSet(layer)
+            group = QActionGroup(self.iface.mainWindow())
+            self.level_data[layer] = group
+            for level in levels:
+                action = QAction(level, self.iface.mainWindow())
+                action.setCheckable(True)
+                action.triggered.connect(lambda b, ly=layer, l=level: self.levelSelected(ly, l))
+                self.level_menu.addAction(action)
+                group.addAction(action)
+    
+    def levelSelected(self, layer, level):
+        layer.setSubsetString(None)
+        layer.setSubsetString('"level"=\'{}\''.format(level))
+        layer.updateExtents(True)
+
+    def buildLevelSet(self, layer):
+        query = '"level"<> \'NULL\''
+        selection = layer.getFeatures(QgsFeatureRequest().setFilterExpression(query))
+        return sorted(set([feature["level"] for feature in selection]))
+
 
     def unload(self):
+        """Disconnect the LayerChanged Signal"""
+        self.iface.currentLayerChanged.disconnect()
+
         """Removes the plugin menu item and icon from QGIS GUI."""
         for action in self.actions:
             self.iface.removePluginMenu(
