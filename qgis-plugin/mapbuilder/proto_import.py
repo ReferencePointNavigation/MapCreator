@@ -2,7 +2,7 @@
 import sys, os
 protos_path = os.path.join(os.path.dirname(__file__), 'proto')
 if protos_path not in sys.path:
-    sys.path.append(protos_path)
+	sys.path.append(protos_path)
 
 from .proto import BuildingMapProto_pb2
 from qgis.core import QgsVectorLayer, QgsProject, QgsFeature, QgsGeometry, QgsPointXY, QgsPolygon
@@ -66,8 +66,8 @@ def newLayers(name):
 	]
 	
 	layers = {
-		"point" : QgsVectorLayer('Point?crs=epsg:3857&field='+'&field='.join(point_fields), name , "memory"),
-		"polygon" : QgsVectorLayer('Polygon?crs=epsg:3857&field='+'&field='.join(base_fields), name , "memory"),
+		"point": QgsVectorLayer('Point?crs=epsg:3857&field='+'&field='.join(point_fields), name , "memory"),
+		"polygon": QgsVectorLayer('Polygon?crs=epsg:3857&field='+'&field='.join(base_fields), name , "memory"),
 	}
 	return layers
 

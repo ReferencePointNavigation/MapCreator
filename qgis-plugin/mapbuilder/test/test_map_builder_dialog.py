@@ -12,15 +12,21 @@ __author__ = 'chebizarro@gmail.com'
 __date__ = '2018-10-19'
 __copyright__ = 'Copyright 2018, Chris Daley'
 
+
+import sys
 import unittest
 
-from PyQt5.QtGui import QDialogButtonBox, QDialog
+from PyQt5.QtWidgets import QDialogButtonBox, QDialog
 
-from map_builder_dialog import MapBuilderDialog
-
-from utilities import get_qgis_app
+from .utilities import get_qgis_app
 QGIS_APP = get_qgis_app()
 
+from PyQt5.QtWidgets import QApplication
+
+app = QApplication(sys.argv)
+
+
+from mapbuilder.map_builder_dialog import MapBuilderDialog
 
 class MapBuilderDialogTest(unittest.TestCase):
     """Test dialog works."""

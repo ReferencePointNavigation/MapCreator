@@ -40,23 +40,16 @@ if protos_path not in sys.path:
     sys.path.append(protos_path)
 
 from .proto_import import parseProtobuf
-from .proto_export import NavatarMap
+from .proto_export import RPNMap
 
 class MapBuilder:
     """QGIS Plugin Implementation."""
-
     def __init__(self, iface):
         """Constructor.
-
-        :param iface: An interface instance that will be passed to this class
-            which provides the hook by which you can manipulate the QGIS
-            application at run time.
+        :param iface: A QGIS interface instance
         :type iface: QgsInterface
         """
-        # Save reference to the QGIS interface
         self.iface = iface
-                
-        # initialize plugin directory
         self.plugin_dir = os.path.dirname(__file__)
         # initialize locale
         locale = QSettings().value('locale/userLocale')[0:2]
@@ -186,9 +179,6 @@ class MapBuilder:
         self.show_all_action.setCheckable(True)
         self.show_all_action.triggered.connect(lambda b: self.iface.activeLayer().setSubsetString(None))
 
-        self.setUpLevelMenu()
-
-        """
         self.add_action(
             ':/plugins/map_builder/resources/floor.svg',
             text=self.tr(u'Add Navigable Space'),
@@ -200,7 +190,9 @@ class MapBuilder:
             text=self.tr(u'Add Landmark'),
             callback=self.openExport,
             parent=self.iface.mainWindow())
-        """
+
+        self.setUpLevelMenu()
+
         
     def setUpLevelMenu(self):
         self.level_menu = QMenu()
@@ -290,5 +282,5 @@ class MapBuilder:
         title = 'Select Directory'
         if qfd.exec_() == QDialog.Accepted:
             layers = [layer for name, layer in QgsProject.instance().mapLayers().items() if type(layer) == QgsVectorLayer]
-            exporter = NavatarMap()
+            exporter = RPNMap()
             exporter.export_map(layers, qfd.selectedFiles()[0])

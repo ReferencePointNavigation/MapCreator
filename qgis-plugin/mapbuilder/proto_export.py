@@ -1,15 +1,9 @@
 # -*- coding: utf-8 -*-
-import random
-
-from .proto import BuildingMapProto_pb2
-
-from qgis.core import (
-	QgsVectorLayer, QgsProject, QgsFeature, QgsGeometry, QgsPointXY,
-	QgsPolygon, QgsWkbTypes, QgsFeatureRequest, QgsMessageLog
-)
+from .proto import BuildingMapProto_pb2 as BuildingMapProto
+from qgis.core import QgsWkbTypes, QgsFeatureRequest, QgsMessageLog
 
 
-class NavatarMap:
+class RPNMap:
 	def __init__(self):
 		pass
 		
@@ -67,7 +61,7 @@ class NavatarMap:
 
 	def new_building_map(self, building):
 		buildingExtent = building.geometry().boundingBox()
-		buildingMap = BuildingMapProto_pb2.BuildingMap()
+		buildingMap = BuildingMapProto.BuildingMap()
 		buildingMap.name = building['name'] or ""
 		buildingMap.minCoordinates.x = buildingExtent.xMinimum()
 		buildingMap.minCoordinates.y = buildingExtent.yMinimum()
