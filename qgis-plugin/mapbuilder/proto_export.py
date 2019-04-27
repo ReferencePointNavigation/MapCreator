@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from .proto import BuildingMapProto_pb2 as BuildingMapProto
-from qgis.core import QgsWkbTypes, QgsFeatureRequest, QgsMessageLog
+from qgis.core import QgsWkbTypes, QgsFeatureRequest
 
 
 class RPNMap:
