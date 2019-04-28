@@ -46,3 +46,7 @@ class Map:
 
     def export(self, filename):
         pass
+
+    @staticmethod
+    def import_from_file(filename):
+        pass
