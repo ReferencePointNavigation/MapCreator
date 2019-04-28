@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package referencepoint.proto;
+
+option java_package = "com.referencepoint.proto";
+
+import "Floor.proto";
+import "Coordinates.proto";
+
+/**
+ * Represents a physical enclosed structure with navigable spaces.
+ */
+message Building {
+    /* The building's boundary */
+    repeated Coordinates boundary = 1;
+    /* The building's name. */
+    string name = 2;
+    /* An array of the floors of this building. */
+    repeated Floor floors = 3;
+}

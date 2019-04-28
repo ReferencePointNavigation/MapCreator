@@ -1,0 +1,29 @@
+/**
+ * Contains the protobuf classes that define the navigable space and the unnavigable inner rings.
+ */
+
+syntax = "proto3";
+
+package referencepoint.proto;
+
+option java_package = "com.referencepoint.proto";
+
+import "Coordinates.proto";
+
+/**
+ * The protobuf that defines the NavigableSpace class.
+ */
+message NavigableSpace {
+    /* The outer polygon that defines the navigable space. */
+    repeated Coordinates outerBoundary = 1;
+    /* The inner rings that define the non navigable spaces within the polygon. */
+    repeated Ring rings = 2;
+}
+
+/**
+ * The protobuf that defines the Ring class.
+ */
+message Ring {
+    /* The inner rings of the navigable space which are inaccessible. */
+    repeated Coordinates polygon = 1;
+}

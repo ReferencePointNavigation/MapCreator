@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package referencepoint.proto;
+
+option java_package = "com.referencepoint.proto";
+
+import "Landmark.proto";
+import "Path.proto";
+
+
+message Route {
+
+    Landmark from = 1;
+
+    Landmark to = 2;
+
+    Path path = 3;
+}

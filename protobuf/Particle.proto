@@ -1,0 +1,25 @@
+/**
+ * Holds the protobuf for the map class.
+ */
+
+syntax = "proto3";
+
+package referencepoint.proto;
+
+option java_package = "com.referencepoint.proto";
+
+message Particle {
+
+    double step = 1;
+
+    double mean_x = 2;
+
+    double mean_y = 3;
+
+    double cov_x = 4;
+
+    double cov_xy = 6;
+
+    double cov_y = 5;
+
+}

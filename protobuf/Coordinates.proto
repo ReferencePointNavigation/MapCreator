@@ -1,0 +1,19 @@
+/**
+ * Stores the protobuf definition of the Coordinates class.
+ */
+
+syntax = "proto3";
+
+package referencepoint.proto;
+
+option java_package = "com.referencepoint.proto";
+
+/**
+ * The protobuf for the Coordinates class used to define points in the map.
+ */
+message Coordinates {
+    /* The x coordinate. */
+    double x = 1;
+    /* The y coordinate. */
+    double y = 2;
+}

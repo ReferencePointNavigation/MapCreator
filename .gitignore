@@ -1,5 +1,5 @@
 __pycache__
+maps
 *.pyc
 .idea
 .noseids
-qgis-plugin/mapbuilder/protobuf

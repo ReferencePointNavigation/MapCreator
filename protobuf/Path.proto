@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package referencepoint.proto;
+
+option java_package = "com.referencepoint.proto";
+
+import "Step.proto";
+
+message Path {
+
+    repeated Step steps = 1;
+
+}
