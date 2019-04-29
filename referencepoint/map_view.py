@@ -14,7 +14,7 @@ class MapView:
 
     def show(self):
         self.plugin.add_action(
-            self.plugin.get_resource('new_map'),
+            self.plugin.get_resource('new'),
             text=self.plugin.tr(u'New Reference Point Map'),
             callback=self.new_map_action)
 

@@ -4,7 +4,7 @@ protos_path = os.path.join(os.path.dirname(__file__), 'proto')
 if protos_path not in sys.path:
 	sys.path.append(protos_path)
 
-from .protobuf import Building_pb2
+from .proto import Building_pb2
 from qgis.core import QgsVectorLayer, QgsProject, QgsFeature, QgsGeometry, QgsPointXY, QgsPolygon
 
 def parseProtobuf(filename):

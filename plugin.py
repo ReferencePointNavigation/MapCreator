@@ -25,7 +25,6 @@ from .resources import *
 # Import the code for the dialog
 import os.path
 
-
 class Plugin:
     """QGIS Plugin Implementation."""
     def __init__(self, iface):

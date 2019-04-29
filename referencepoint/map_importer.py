@@ -1,10 +1,14 @@
 """
 Imports Map definition from Protobuf files
 """
-from .protobuf import Building_pb2, Map_pb2
 import zipfile
-import os
+import os, sys
 
+protos_path = os.path.join(os.path.dirname(__file__), 'proto')
+if protos_path not in sys.path:
+    sys.path.append(protos_path)
+
+from referencepoint.proto import Map_pb2
 
 class MapImporter:
 

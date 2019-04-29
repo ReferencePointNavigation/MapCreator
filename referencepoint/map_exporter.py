@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from .protobuf import Building_pb2 as BuildingMapProto
+from .proto import Building_pb2 as BuildingMapProto
 from qgis.core import QgsWkbTypes, QgsFeatureRequest
 
 
