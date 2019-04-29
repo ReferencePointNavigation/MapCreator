@@ -16,9 +16,9 @@ class Map:
         self.name = name
         self.description = description
         self.layers = dict()
-        self.layers['buildings'] = BuildingLayer(self, u'buildings')
-        self.layers['landmarks'] = LandmarkLayer(self, u'landmarks')
-        self.layers['paths'] = PathLayer(self, u'paths')
+        self.layers['buildings'] = BuildingLayer(self, u'Buildings')
+        self.layers['landmarks'] = LandmarkLayer(self, u'Landmarks')
+        self.layers['paths'] = PathLayer(self, u'Paths')
 
     def export(self, filename):
         pass

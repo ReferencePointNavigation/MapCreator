@@ -16,7 +16,7 @@ class MapBuilder:
     def new_map(self, name):
         self.map = Map(name)
         self.view.add_layer_group(self.map.name)
-        for layer in self.map.layers:
+        for layer in self.map.layers.values():
             layer.layer = self.view.add_layer(layer.name, layer.to_string())
 
     def save_map(self, dir):
