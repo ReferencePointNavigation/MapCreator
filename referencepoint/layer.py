@@ -6,7 +6,7 @@ class Layer(object):
         'indoor:string(25)',
     ]
 
-    def __init__(self, map, name, geom_type, epsg = "3857"):
+    def __init__(self, map, name, geom_type, epsg):
         self.map = map
         self.name = name
         self.geom_type = geom_type
@@ -18,11 +18,15 @@ class Layer(object):
 
 
 class LandmarkLayer(Layer):
-    pass
+    def __init__(self, map, name, epsg='3857'):
+        super().__init__(map, name, 'Point', epsg)
+
 
 class BuildingLayer(Layer):
-    pass
+    def __init__(self, map, name, epsg='3857'):
+        super().__init__(map, name, 'Polygon', epsg)
 
 
 class PathLayer(Layer):
-    pass
+    def __init__(self, map, name, epsg='3857'):
+        super().__init__(map, name, 'Multiline', epsg)

@@ -1,18 +1,9 @@
-from .protobuf import *
-
-from qgis.core import QgsProject, QgsVectorLayer
+from .layer import LandmarkLayer, BuildingLayer, PathLayer
 
 building_query = '"building" = \'yes\' and "name" <> \'NULL\''
 floor_query = '"indoor"<> \'NULL\''
-epsg = "3857"
 
-base_fields = [
-    'name:string(25)',
-    'level:integer',
-    'indoor:string(25)',
-]
-
-point_fields = base_fields + [
+point_fields = [
     'type:string(12)',
     'wheelchair:string(25)',
     'amenity:string(25)',
@@ -21,17 +12,13 @@ point_fields = base_fields + [
 
 
 class Map:
-    def __init__(self, name):
+    def __init__(self, name='', description=''):
         self.name = name
-        self.layers = {}
-        root = QgsProject.instance().layerTreeRoot()
-        self.group = root.insertGroup(0, name)
-
-    def add_layer(self, layer):
-        self.layers += {layer.name : layer}
-        layer = QgsVectorLayer(layer.to_string(), layer.name, "memory")
-        self.group.addLayer(layer)
-        return layer
+        self.description = description
+        self.layers = dict()
+        self.layers['buildings'] = BuildingLayer(self, u'buildings')
+        self.layers['landmarks'] = LandmarkLayer(self, u'landmarks')
+        self.layers['paths'] = PathLayer(self, u'paths')
 
     def export(self, filename):
         pass

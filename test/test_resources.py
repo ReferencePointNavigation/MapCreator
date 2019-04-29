@@ -31,7 +31,7 @@ class MapBuilderDialogTest(unittest.TestCase):
 
     def test_icon_png(self):
         """Test we can click OK."""
-        path = ':/plugins/MapBuilder/icon.png'
+        path = ':/plugins/Plugin/icon.png'
         icon = QIcon(path)
         self.assertFalse(icon.isNull())
 

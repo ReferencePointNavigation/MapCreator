@@ -1,3 +1,3 @@
-[submodule "qgis-plugin/mapbuilder/referencepoint/protobuf"]
-	path = qgis-plugin/mapbuilder/referencepoint/protobuf
+[submodule "referencepoint/protobuf"]
+	path = referencepoint/protobuf
 	url = https://github.com/ReferencePointNavigation/protobuf.git

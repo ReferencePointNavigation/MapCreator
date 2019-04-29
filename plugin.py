@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 /***************************************************************************
- MapBuilder
+ Plugin
                                  A QGIS plugin
  This plugin builds a Reference Point Navigation map
                               -------------------
@@ -12,25 +12,21 @@
  ***************************************************************************/
 """
 import os, sys
+from referencepoint import MapBuilder, MapView
 
 from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QAction
+from PyQt5.QtWidgets import QAction, QFileDialog, QDialog, QInputDialog, QLineEdit
 
-from qgis.core import QgsMessageLog, Qgis
-
-import ui
+from qgis.core import QgsProject, QgsVectorLayer
 
 # Initialize Qt resources from file resources.py
 from .resources import *
 # Import the code for the dialog
 import os.path
 
-protos_path = os.path.join(os.path.dirname(__file__), 'protobuf')
-if protos_path not in sys.path:
-    sys.path.append(protos_path)
 
-class MapBuilder:
+class Plugin:
     """QGIS Plugin Implementation."""
     def __init__(self, iface):
         """Constructor.
@@ -56,9 +52,12 @@ class MapBuilder:
         # Declare instance attributes
         self.actions = []
         self.menu = self.tr(u'&Reference Point Map Builder')
-        self.toolbar = self.iface.addToolBar(u'MapBuilder')
+        self.toolbar = self.iface.addToolBar(u'Map Builder')
         self.toolbar.setObjectName(u'MapBuilder')
         self.resource_path = ':/plugins/map_builder/resources/'
+
+        self.view = MapView(self, QgsProject.instance())
+        self.controller = MapBuilder(self.view)
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -75,6 +74,8 @@ class MapBuilder:
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
         return QCoreApplication.translate('MapBuilder', message)
 
+    def get_resource(self, name):
+        return self.resource_path + name + '.svg'
 
     def add_action(
         self,
@@ -125,6 +126,8 @@ class MapBuilder:
             added to self.actions list.
         :rtype: QAction
         """
+        if parent is None:
+            parent = self.iface.mainWindow()
 
         icon = QIcon(icon_path)
         action = QAction(icon, text, parent)
@@ -151,10 +154,27 @@ class MapBuilder:
 
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
-        ui.UIInterface.UIInterface(self)
-        elements = ui.UIInterface.UIInterface.get_ui_elements(self)
-        QgsMessageLog.logMessage(str(elements), 'RPN', level=Qgis.Info)
+        self.view.show()
 
+    def show_open_dialog(self, title):
+        qfd = QFileDialog()
+        f = QFileDialog.getOpenFileName(qfd, title, '~')
+        return f[0]
+
+    def show_save_folder_dialog(self, title):
+        qfd = QFileDialog()
+        qfd.setFileMode(QFileDialog.DirectoryOnly)
+        if qfd.exec_() == QDialog.Accepted:
+            return qfd.selectedFiles()[0]
+        else:
+            return None
+
+    def show_input_dialog(self, title, prompt):
+        text, _ = QInputDialog.getText(self.iface.mainWindow(), title, prompt, QLineEdit.Normal, '')
+        return text
+
+    def new_layer(self, path, baseName):
+        return QgsVectorLayer(path, baseName, 'memory')
 
     def unload(self):
         """Disconnect the LayerChanged Signal"""

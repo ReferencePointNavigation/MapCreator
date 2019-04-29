@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 /***************************************************************************
- MapBuilder
+ Plugin
                                  A QGIS plugin
  This plugin builds a Reference Point Navigation map
                              -------------------
@@ -20,11 +20,11 @@ sys.path.append(os.path.dirname(__file__))
 
 # noinspection PyPep8Naming
 def classFactory(iface):  # pylint: disable=invalid-name
-    """Load MapBuilder class from file MapBuilder.
+    """Load Plugin class from file Plugin.
 
     :param iface: A QGIS interface instance.
     :type iface: QgsInterface
     """
     #
-    from .plugin import MapBuilder
-    return MapBuilder(iface)
+    from .plugin import Plugin
+    return Plugin(iface)

@@ -4,8 +4,8 @@ from qgis.core import QgsWkbTypes, QgsFeatureRequest
 
 
 class MapExporter:
-	def __init__(self):
-		pass
+	def __init__(self, map):
+		self.map = map
 		
 	def export_map(self, layers, filepath):
 		maps = self.get_maps(layers)
