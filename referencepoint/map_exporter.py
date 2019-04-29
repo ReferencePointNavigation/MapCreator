@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-from .proto import BuildingMapProto_pb2 as BuildingMapProto
+from .protobuf import Building_pb2 as BuildingMapProto
 from qgis.core import QgsWkbTypes, QgsFeatureRequest
 
 
-class RPNMap:
+class MapExporter:
 	def __init__(self):
 		pass
 		
@@ -61,7 +61,7 @@ class RPNMap:
 
 	def new_building_map(self, building):
 		buildingExtent = building.geometry().boundingBox()
-		buildingMap = BuildingMapProto.BuildingMap()
+		buildingMap = BuildingMapProto.Building()
 		buildingMap.name = building['name'] or ""
 		buildingMap.minCoordinates.x = buildingExtent.xMinimum()
 		buildingMap.minCoordinates.y = buildingExtent.yMinimum()

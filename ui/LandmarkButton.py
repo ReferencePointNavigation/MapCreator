@@ -1,7 +1,7 @@
-from .UIInterface import UIInterface, UIInterfaceMeta
+from .UIInterface import UIInterface
 
 
-class LandmarkButton(UIInterface, metaclass=UIInterfaceMeta):
+class LandmarkButton(UIInterface):
 
     def __init__(self, plugin):
         super().__init__(plugin)

@@ -17,7 +17,9 @@ from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction
 
-from ui.UIInterface import UIInterface
+from qgis.core import QgsMessageLog, Qgis
+
+import ui
 
 # Initialize Qt resources from file resources.py
 from .resources import *
@@ -149,7 +151,9 @@ class MapBuilder:
 
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
-        elements = UIInterface.get_ui_elements(self)
+        ui.UIInterface.UIInterface(self)
+        elements = ui.UIInterface.UIInterface.get_ui_elements(self)
+        QgsMessageLog.logMessage(str(elements), 'RPN', level=Qgis.Info)
 
 
     def unload(self):

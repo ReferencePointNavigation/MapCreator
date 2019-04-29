@@ -1,4 +1,4 @@
-from mapbuilder.protobuf import *
+from .protobuf import *
 
 from qgis.core import QgsProject, QgsVectorLayer
 
@@ -23,26 +23,15 @@ point_fields = base_fields + [
 class Map:
     def __init__(self, name):
         self.name = name
-
-
-    def createNewMap(self, name):
-
+        self.layers = {}
         root = QgsProject.instance().layerTreeRoot()
         self.group = root.insertGroup(0, name)
 
-        self.layers = {
-            "point": self.createLayer('Landmarks', epsg, 'Point', point_fields),
-            "polygon": self.createLayer('Buildings', epsg, 'Polygon', base_fields),
-            "line": self.createLayer('Paths', epsg, 'Line', base_fields)
-        }
-
-        for layer in self.layers.values():
-            self.group.addLayer(layer)
-
-    def createLayer(self, name, espg, geomType, fields):
-        lyrStr = '{0}?crs={0}&field={1}'.format(geomType, epsg, '&field='.join(fields))
-        return QgsVectorLayer(lyrStr, name, "memory")
-
+    def add_layer(self, layer):
+        self.layers += {layer.name : layer}
+        layer = QgsVectorLayer(layer.to_string(), layer.name, "memory")
+        self.group.addLayer(layer)
+        return layer
 
     def export(self, filename):
         pass

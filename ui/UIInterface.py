@@ -2,11 +2,10 @@
 class UIInterfaceMeta(type):
     def __init__(cls, name, bases, dct):
         super(UIInterfaceMeta, cls).__init__(name, bases, dct)
-
         if not hasattr(cls, 'registry'):
             cls.registry = set()
         cls.registry.add(cls)
-        cls.registry -= set(bases)
+        #cls.registry -= set(bases)
 
     def __iter__(cls):
         return iter(cls.registry)
@@ -17,7 +16,7 @@ class UIInterfaceMeta(type):
         return cls.__name__ + ": " + ", ".join([sc.__name__ for sc in cls])
 
 
-class UIInterface(object, metaclass=UIInterfaceMeta):
+class UIInterface(metaclass=UIInterfaceMeta):
 
     def __init__(self, plugin):
         self.plugin = plugin
