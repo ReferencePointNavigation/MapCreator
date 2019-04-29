@@ -1,4 +1,5 @@
 from .map import Map
+from .map_importer import MapImporter
 
 class MapBuilder:
     """
@@ -11,7 +12,8 @@ class MapBuilder:
         self.view.set_controller(self)
 
     def import_map(self, file):
-        pass
+        importer = MapImporter(self.map)
+        importer.import_map(file)
 
     def new_map(self, name):
         self.map = Map(name)
