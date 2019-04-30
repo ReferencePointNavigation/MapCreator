@@ -7,9 +7,10 @@ class MapBuilder:
     """
     map = None
 
-    def __init__(self, view):
+    def __init__(self, view, filter):
         self.view = view
         self.view.set_controller(self)
+        self.filter = filter
 
     def import_map(self, file):
         importer = MapImporter(self.map)

@@ -18,7 +18,7 @@ from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction, QFileDialog, QDialog, QInputDialog, QLineEdit
 
-from qgis.core import QgsProject, QgsVectorLayer
+from qgis.core import QgsProject, QgsVectorLayer, QgsFeatureRequest
 
 # Initialize Qt resources from file resources.py
 from .resources import *
@@ -56,7 +56,7 @@ class Plugin:
         self.resource_path = ':/plugins/map_builder/resources/'
 
         self.view = MapView(self, QgsProject.instance())
-        self.controller = MapBuilder(self.view)
+        self.controller = MapBuilder(self.view, lambda q: QgsFeatureRequest().setFilterExpression(q))
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
