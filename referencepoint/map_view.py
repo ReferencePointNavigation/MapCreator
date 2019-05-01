@@ -95,9 +95,11 @@ class MapView:
 
     def save_action(self):
         title = self.plugin.tr(u'Select Directory')
-        dir = self.plugin.show_save_folder_dialog(title)
-        if dir is not '':
-            self.controller.save_map(dir)
+        filepath = self.plugin.show_save_folder_dialog(title)
+        if filepath is not '':
+            if self.current is not None:
+                self.current.layer().commitChanges()
+            self.controller.save_map(filepath)
 
     def add_building_action(self):
         self.set_active_layer('Buildings')

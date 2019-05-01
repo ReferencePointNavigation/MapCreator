@@ -1,5 +1,6 @@
 from .map import Map
 from .map_importer import MapImporter
+from .map_exporter import MapExporter
 
 
 class MapBuilder:
@@ -23,5 +24,6 @@ class MapBuilder:
         self.map.add_layers(layers)
         self.view.add_layers(layers.values())
 
-    def save_map(self, dir):
-        pass
+    def save_map(self, filepath):
+        exporter = MapExporter(self.map)
+        exporter.export_map(filepath)

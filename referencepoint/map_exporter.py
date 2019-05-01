@@ -40,15 +40,38 @@ class MapExporter:
         map_proto = Map_pb2.Map()
         map_proto.name = self.map.name
 
-        for building in self.export_buildings():
-            building_proto = self.export_building(building)
-            zf.writestr(building_proto.name.replace(' ', '_'), building_proto.SerializeToString())
+        bldg_layer = self.map.layers['buildings']
+        buildings = bldg_layer.get_features()
+        paths = self.map.layers['paths'].get_features()
+        landmarks = self.map.layers['landmarks'].get_features()
+        rooms = self.map.layers['rooms'].get_features()
 
-        self.export_paths(map_proto)
+        for building in buildings:
+            for points in bldg_layer.transform_polygon(building.geometry().asPolygon()[0]):
+                point = map_proto.buildings[building['name']].vertices.add()
+                point.x = points.x()
+                point.y = points.y()
+            bldg = Building_pb2.Building()
+            # add floors
+            for room in rooms:
+                if building.geometry().intersects(room.geometry()):
+                    flr = bldg.floors.add()
+                    rm = flr.navigableSpaces.add()
+                    for points in bldg_layer.transform_polygon(room.geometry().asPolygon()[0]):
+                        point = rm.outerBoundary.add()
+                        point.x = points.x()
+                        point.y = points.y()
+                    for landmark in landmarks:
+                        if room.geometry().intersects(landmark.geometry()) and landmark['level'] == room['level']:
+                            geom = bldg_layer.transform(landmark.geometry().asPoint())
+                            lm = flr.landmarks.add()
+                            lm.name = landmark['name']
+                            lm.location.x = geom[0]
+                            lm.location.y = geom[1]
 
-        self.export_landmarks(map_proto)
+            zf.writestr(building['name'].replace(' ', '_') + '.bldg', bldg.SerializeToString())
 
-        zf.writestr(self.map.name.replace(' ', '_'), map_proto.SerializeToString())
+        zf.writestr(self.map.name.replace(' ', '_') + '.map', map_proto.SerializeToString())
         zf.close()
 
     def export_buildings(self):
