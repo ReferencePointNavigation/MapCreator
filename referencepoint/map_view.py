@@ -5,6 +5,7 @@ class MapView:
     controller = None
     group = None
     layers = None
+    current = None
 
     def __init__(self, plugin, project):
         self.plugin = plugin
@@ -100,7 +101,6 @@ class MapView:
 
     def add_building_action(self):
         self.set_active_layer('Buildings')
-        self.layers['Buildings'].layer().startEditing()
 
     def add_floor_action(self):
         self.set_active_layer('Rooms')
@@ -112,10 +112,16 @@ class MapView:
         self.set_active_layer('Paths')
 
     def set_active_layer(self, layer):
-        self.plugin.set_active_layer(self.layers[layer].layer())
+        if self.current is not None:
+            self.current.layer().commitChanges()
+        self.current = self.layers[layer]
+        self.plugin.set_active_layer(self.current.layer())
+        self.current.layer().startEditing()
+        self.plugin.set_add_feature()
 
     def move_action(self):
-        pass
+        if self.current is not None:
+            self.plugin.select_move_tool()
 
     def add_layer(self, name, path):
         layer = self.plugin.new_layer(path, self.plugin.tr(name))

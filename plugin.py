@@ -178,8 +178,14 @@ class Plugin:
     def show_help(self):
         showPluginHelp()
 
+    def select_move_tool(self):
+        self.iface.actionMoveFeature().trigger()
+
     def set_active_layer(self, layer):
         self.iface.setActiveLayer(layer)
+
+    def set_add_feature(self):
+        self.iface.actionAddFeature().trigger()
 
     def unload(self):
         """Disconnect the LayerChanged Signal"""

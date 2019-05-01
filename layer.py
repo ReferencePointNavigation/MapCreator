@@ -1,4 +1,4 @@
-from qgis.core import QgsVectorLayer, QgsFeatureRequest
+from qgis.core import QgsVectorLayer, QgsFeatureRequest, QgsDefaultValue
 
 
 class Layer(object):
@@ -12,9 +12,13 @@ class Layer(object):
         self.name = name
         path = '{0}?crs=epsg:{1}&field={2}'.format(geom_type, crs, '&field='.join(self.fields))
         self.layer = QgsVectorLayer(path, name, 'memory')
+        #self.layer.setDefaultValueDefinition(2, QgsDefaultValue('\'yes\''))
 
     def add_to_group(self, group):
         return group.addLayer(self.layer)
+
+    def start_editing(self):
+        self.layer.startEditing()
 
     def get_features(self, query):
         return self.layer.getFeatures(QgsFeatureRequest().setFilterExpression(query))
