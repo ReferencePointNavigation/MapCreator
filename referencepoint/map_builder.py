@@ -1,16 +1,17 @@
 from .map import Map
 from .map_importer import MapImporter
 
+
 class MapBuilder:
     """
     The MapBuilder class is the Controller for the plugin
     """
     map = None
 
-    def __init__(self, view, filter):
+    def __init__(self, view, layer_factory):
         self.view = view
         self.view.set_controller(self)
-        self.filter = filter
+        self.layer_factory = layer_factory
 
     def import_map(self, file):
         importer = MapImporter(self.map)
@@ -18,9 +19,9 @@ class MapBuilder:
 
     def new_map(self, name):
         self.map = Map(name)
-        self.view.add_layer_group(self.map.name)
-        for layer in self.map.layers.values():
-            layer.layer = self.view.add_layer(layer.name, layer.to_string())
+        layers = self.layer_factory.new_layers()
+        self.map.add_layers(layers)
+        self.view.add_layers(layers.values())
 
     def save_map(self, dir):
         pass

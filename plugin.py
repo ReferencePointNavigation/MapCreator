@@ -13,13 +13,13 @@
 """
 import os, sys
 from referencepoint import MapBuilder, MapView
-
+from .layer import LayerFactory
 from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction, QFileDialog, QDialog, QInputDialog, QLineEdit
 
 from qgis.core import QgsProject, QgsVectorLayer, QgsFeatureRequest
-
+from qgis.utils import showPluginHelp
 # Initialize Qt resources from file resources.py
 from .resources import *
 # Import the code for the dialog
@@ -56,7 +56,7 @@ class Plugin:
         self.resource_path = ':/plugins/map_builder/resources/'
 
         self.view = MapView(self, QgsProject.instance())
-        self.controller = MapBuilder(self.view, lambda q: QgsFeatureRequest().setFilterExpression(q))
+        self.controller = MapBuilder(self.view, LayerFactory())
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -151,6 +151,9 @@ class Plugin:
 
         return action
 
+    def add_separator(self):
+        self.toolbar.addSeparator()
+
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
         self.view.show()
@@ -172,8 +175,11 @@ class Plugin:
         text, _ = QInputDialog.getText(self.iface.mainWindow(), title, prompt, QLineEdit.Normal, '')
         return text
 
-    def new_layer(self, path, baseName):
-        return QgsVectorLayer(path, baseName, 'memory')
+    def show_help(self):
+        showPluginHelp()
+
+    def set_active_layer(self, layer):
+        self.iface.setActiveLayer(layer)
 
     def unload(self):
         """Disconnect the LayerChanged Signal"""

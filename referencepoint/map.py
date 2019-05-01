@@ -1,4 +1,3 @@
-from .layer import LandmarkLayer, BuildingLayer, PathLayer
 
 building_query = '"building" = \'yes\' and "name" <> \'NULL\''
 floor_query = '"indoor"<> \'NULL\''
@@ -12,13 +11,13 @@ point_fields = [
 
 
 class Map:
-    def __init__(self, name='', description=''):
+    layers = None
+
+    def __init__(self, name):
         self.name = name
-        self.description = description
-        self.layers = dict()
-        self.layers['buildings'] = BuildingLayer(self, u'Buildings')
-        self.layers['landmarks'] = LandmarkLayer(self, u'Landmarks')
-        self.layers['paths'] = PathLayer(self, u'Paths')
+
+    def add_layers(self, layers):
+        self.layers = layers
 
     def export(self, filename):
         pass
