@@ -75,12 +75,16 @@ class MapView:
         prompt = self.plugin.tr(u'Name:')
         mapname = self.plugin.show_input_dialog(title, prompt)
         if mapname is not '':
-            self.project.clear()
-            self.layers = dict()
-            self.group = self.project.layerTreeRoot().insertGroup(0, mapname)
-            self.controller.new_map(mapname)
-            for action in self.plugin.actions:
-                action.setEnabled(True)
+            self.new_map(mapname)
+
+    def new_map(self, mapname):
+        self.project.clear()
+        self.current = None
+        self.layers = dict()
+        self.group = self.project.layerTreeRoot().insertGroup(0, mapname)
+        self.controller.new_map(mapname)
+        for action in self.plugin.actions:
+            action.setEnabled(True)
 
     def add_layers(self, layers):
         if self.group is not None:
@@ -91,11 +95,8 @@ class MapView:
         title = self.plugin.tr(u'Open File')
         f = self.plugin.show_open_dialog(title)
         if len(f) > 2:
-            self.project.clear()
-            self.layers = dict()
             mapname, _ = os.path.splitext(os.path.basename(f))
-            self.group = self.project.layerTreeRoot().insertGroup(0, mapname)
-            self.controller.new_map(mapname)
+            self.new_map(mapname)
             self.controller.import_map(f)
 
     def save_action(self):

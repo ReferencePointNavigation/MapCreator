@@ -11,6 +11,8 @@ from qgis.core import (
     QgsPointXY
 )
 
+import qgis.utils
+
 class Layer(object):
 
     def __init__(self, name, geom_type, crs):
@@ -69,6 +71,14 @@ class Layer(object):
 class LayerFactory:
 
     def new_layers(self, crs='3857'):
+
+        try:
+            olplugin = qgis.utils.plugins['openlayers_plugin']
+            ol_gphyslayertype = olplugin._olLayerTypeRegistry.getById(4)
+            olplugin.addLayer(ol_gphyslayertype)
+        except KeyError:
+            pass
+
         return {
             'landmarks': LandmarkLayer(crs),
             'paths': PathLayer(crs),
@@ -87,7 +97,7 @@ class BuildingLayer(Layer):
     def add_feature(self, name, geom):
         feature = self.new_feature()
         points = [self.transform(QgsPointXY(c.x, c.y), src='4326', dest='3857') for c in geom]
-        feature.setGeometry(feature.setGeometry(QgsGeometry.fromPolygonXY([points])))
+        feature.setGeometry(QgsGeometry.fromPolygonXY([points]))
         feature['name'] = name
         self.layer.dataProvider().addFeatures([feature])
         return feature
@@ -133,6 +143,7 @@ class RoomLayer(Layer):
     def add_feature(self, name, geom):
         feature = self.new_feature()
         points = [self.transform(QgsPointXY(c.x, c.y), src='4326', dest='3857') for c in geom]
-        feature.setGeometry(feature.setGeometry(QgsGeometry.fromPolygonXY([points])))
+        feature.setGeometry(QgsGeometry.fromPolygonXY([points]))
         self.layer.dataProvider().addFeatures([feature])
         return feature
+
