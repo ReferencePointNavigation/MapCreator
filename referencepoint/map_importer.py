@@ -8,7 +8,7 @@ protos_path = os.path.join(os.path.dirname(__file__), 'proto')
 if protos_path not in sys.path:
     sys.path.append(protos_path)
 
-from referencepoint.proto import Map_pb2
+from referencepoint.proto import Map_pb2, Building_pb2
 
 
 class MapImporter:
@@ -25,29 +25,24 @@ class MapImporter:
         self.map = map
 
     def import_map(self, file):
-
         zf = zipfile.ZipFile(file)
-        f, _ = os.path.splitext(file)
-        data = zf.read(f)
+        f, _ = os.path.splitext(os.path.basename(file))
+        data = zf.read(f + '.map')
 
         map_proto = Map_pb2.Map()
         map_proto.ParseFromString(data)
         self.map.name = map_proto.name
 
-        for building in map_proto.buildings:
-            self.import_building(building)
-
-        for path in map_proto.paths:
-            pass
-
-        for landmark in map_proto.landmarks:
-            pass
+        for bldg, poly in map_proto.buildings.items():
+            bldg_data = zf.read(bldg.replace(' ', '_') + '.bldg')
+            bldg_proto = Building_pb2.Building()
+            bldg_proto.ParseFromString(bldg_data)
+            self.import_building(bldg_proto)
 
     def import_building(self, building):
-        pass
+        for floor in building.floors:
+            for landmark in floor.landmarks:
+                self.map.layers['landmarks'].add_feature(landmark.name, landmark.location)
 
-    def import_path(self, path):
-        pass
-
-    def import_landmark(self, landmark):
-        pass
+            for room in floor.navigableSpaces:
+                self.map.layers['rooms'].add_feature("", room.outerBoundary)

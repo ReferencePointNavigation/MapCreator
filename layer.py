@@ -5,7 +5,11 @@ from qgis.core import (
     QgsCoordinateTransform,
     QgsCoordinateReferenceSystem,
     QgsProject,
-    QgsEditorWidgetSetup)
+    QgsEditorWidgetSetup,
+    QgsFeature,
+    QgsGeometry,
+    QgsPointXY
+)
 
 class Layer(object):
 
@@ -53,6 +57,14 @@ class Layer(object):
             QgsProject.instance())
         return tf.transform(point)
 
+    def add_feature(self, name, geom):
+        return None
+
+    def new_feature(self):
+        f = QgsFeature()
+        f.setFields(self.layer.fields())
+        return f
+
 
 class LayerFactory:
 
@@ -72,6 +84,14 @@ class BuildingLayer(Layer):
         self.query = '"building" = \'yes\' and "name" <> \'NULL\''
         self.layer.setDefaultValueDefinition(2, QgsDefaultValue('\'yes\''))
 
+    def add_feature(self, name, geom):
+        feature = self.new_feature()
+        points = [self.transform(QgsPointXY(c.x, c.y), src='4326', dest='3857') for c in geom]
+        feature.setGeometry(feature.setGeometry(QgsGeometry.fromPolygonXY([points])))
+        feature['name'] = name
+        self.layer.dataProvider().addFeatures([feature])
+        return feature
+
 
 class LandmarkLayer(Layer):
     def __init__(self, crs):
@@ -86,6 +106,20 @@ class LandmarkLayer(Layer):
                     {'ELEVATOR':'4'}]}))
         self.layer.setDefaultValueDefinition(3, QgsDefaultValue('1'))
 
+    def add_feature(self, name, geom):
+        feature = self.new_feature()
+        feature.setGeometry(
+            QgsGeometry.fromPointXY(
+                self.transform(
+                    QgsPointXY(geom.x, geom.y),
+                    src='4326',
+                    dest='3857')
+            )
+        )
+        feature['name'] = name
+        self.layer.dataProvider().addFeatures([feature])
+        return feature
+
 
 class PathLayer(Layer):
     def __init__(self, crs):
@@ -94,6 +128,11 @@ class PathLayer(Layer):
 
 class RoomLayer(Layer):
     def __init__(self, crs):
-        #self.fields = ['indoor:string(25)']
         super().__init__(u'Rooms', 'Polygon', crs)
-        #self.query = '"indoor"<> \'NULL\''
+
+    def add_feature(self, name, geom):
+        feature = self.new_feature()
+        points = [self.transform(QgsPointXY(c.x, c.y), src='4326', dest='3857') for c in geom]
+        feature.setGeometry(feature.setGeometry(QgsGeometry.fromPolygonXY([points])))
+        self.layer.dataProvider().addFeatures([feature])
+        return feature

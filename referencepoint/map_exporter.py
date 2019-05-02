@@ -60,9 +60,10 @@ class MapExporter:
                 for floor in bldg.floors:
                     if floor.number == flr_no:
                         flr = floor
-                    else:
-                        flr = bldg.floors.add()
-                        flr.number = flr_no
+                        break
+                if flr is None:
+                    flr = bldg.floors.add()
+                    flr.number = flr_no
                 rm = flr.navigableSpaces.add()
                 for points in room.geometry().asPolygon()[0]:
                     point = rm.outerBoundary.add()

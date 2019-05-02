@@ -1,4 +1,4 @@
-
+import os
 
 class MapView:
 
@@ -91,6 +91,11 @@ class MapView:
         title = self.plugin.tr(u'Open File')
         f = self.plugin.show_open_dialog(title)
         if len(f) > 2:
+            self.project.clear()
+            self.layers = dict()
+            mapname, _ = os.path.splitext(os.path.basename(f))
+            self.group = self.project.layerTreeRoot().insertGroup(0, mapname)
+            self.controller.new_map(mapname)
             self.controller.import_map(f)
 
     def save_action(self):
