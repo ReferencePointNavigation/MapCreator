@@ -12,8 +12,16 @@ from referencepoint.proto import Map_pb2
 
 
 class MapImporter:
-
+    """
+    The MapImporter class deserializes the the Protobuf representation
+    from a zip file with the .rpn extension
+    """
     def __init__(self, map):
+        """
+        Constructor
+        :param map: A Reference Point Map
+        :type map: Map
+        """
         self.map = map
 
     def import_map(self, file):
@@ -25,7 +33,6 @@ class MapImporter:
         map_proto = Map_pb2.Map()
         map_proto.ParseFromString(data)
         self.map.name = map_proto.name
-        self.map.description = map_proto.description
 
         for building in map_proto.buildings:
             self.import_building(building)

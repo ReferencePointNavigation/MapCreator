@@ -8,8 +8,6 @@ if protos_path not in sys.path:
 
 from referencepoint.proto import Map_pb2, Building_pb2
 
-from qgis.core import QgsWkbTypes
-
 
 class MapExporter:
     """
@@ -22,9 +20,6 @@ class MapExporter:
         Constructor
         :param map: A Reference Point Map
         :type map: Map
-        :param expr: A function which returns a QgsFeatureRequest based on the
-            passed query string
-        :type expr: FunctionType
         """
         self.map = map
 
@@ -40,179 +35,47 @@ class MapExporter:
         map_proto = Map_pb2.Map()
         map_proto.name = self.map.name
 
-        bldg_layer = self.map.layers['buildings']
-        buildings = bldg_layer.get_features()
-        paths = self.map.layers['paths'].get_features()
-        landmarks = self.map.layers['landmarks'].get_features()
-        rooms = self.map.layers['rooms'].get_features()
+        buildings = self.map.layers['buildings'].get_features()
 
         for building in buildings:
-            for points in bldg_layer.transform_polygon(building.geometry().asPolygon()[0]):
+            for points in building.geometry().asPolygon()[0]:
+                points = self.map.layers['buildings'].transform(points)
                 point = map_proto.buildings[building['name']].vertices.add()
                 point.x = points.x()
                 point.y = points.y()
-            bldg = Building_pb2.Building()
-            # add floors
-            for room in rooms:
-                if building.geometry().intersects(room.geometry()):
-                    flr = bldg.floors.add()
-                    rm = flr.navigableSpaces.add()
-                    for points in bldg_layer.transform_polygon(room.geometry().asPolygon()[0]):
-                        point = rm.outerBoundary.add()
-                        point.x = points.x()
-                        point.y = points.y()
-                    for landmark in landmarks:
-                        if room.geometry().intersects(landmark.geometry()) and landmark['level'] == room['level']:
-                            geom = bldg_layer.transform(landmark.geometry().asPoint())
-                            lm = flr.landmarks.add()
-                            lm.name = landmark['name']
-                            lm.location.x = geom[0]
-                            lm.location.y = geom[1]
+            bldg = self.__export_buildings(building)
 
             zf.writestr(building['name'].replace(' ', '_') + '.bldg', bldg.SerializeToString())
 
         zf.writestr(self.map.name.replace(' ', '_') + '.map', map_proto.SerializeToString())
         zf.close()
 
-    def export_buildings(self):
-        """
-        Build and return a dictionary of all of the buildings in the map
-        :return: a dictionary of all of the buildings
-        :rtype: dict
-        """
-        buildings = {}
-        query = '"building" = \'yes\' and "name" <> \'NULL\''
-        selection = self.map.layers['buildings'].getFeatures(query)
+    def __export_buildings(self, building):
+        bldg = Building_pb2.Building()
+        # add floors
+        for room in self.map.layers['rooms'].get_features(bbox=building.geometry().boundingBox()):
+            if building.geometry().contains(room.geometry()):
+                flr = None
+                flr_no = int(room['level'])
+                for floor in bldg.floors:
+                    if floor.number == flr_no:
+                        flr = floor
+                    else:
+                        flr = bldg.floors.add()
+                        flr.number = flr_no
+                rm = flr.navigableSpaces.add()
+                for points in room.geometry().asPolygon()[0]:
+                    point = rm.outerBoundary.add()
+                    points = self.map.layers['buildings'].transform(points)
+                    point.x = points.x()
+                    point.y = points.y()
+                for landmark in self.map.layers['landmarks'].get_features(bbox=room.geometry().boundingBox()):
+                    if room.geometry().contains(landmark.geometry()) and landmark['level'] == room['level']:
+                        geom = self.map.layers['buildings'].transform(landmark.geometry().asPoint())
+                        lm = flr.landmarks.add()
+                        lm.name = landmark['name']
+                        lm.type = int(landmark['type'])
+                        lm.location.x = geom[0]
+                        lm.location.y = geom[1]
+        return bldg
 
-        for building in selection:
-            buildings[building['name']] = {'feature': building}
-
-        self.get_floors(buildings)
-        return buildings
-
-    def get_floors(self, buildings):
-        query = '"indoor" <> \'NULL\''
-        floors = {}
-
-
-
-        for name, building in buildings.items():
-
-            floors[name] = {}
-            for layer in layers:
-                selection = layer.getFeatures(query)
-                for feature in selection:
-                    if building.geometry().intersects(feature.geometry()) and building is not feature:
-                        level = int(feature['level'])
-                        if level in floors[name]:
-                            floors[name][level].append(feature)
-                        else:
-                            floors[name][level] = [feature]
-        return floors
-
-    def export_building(self, building):
-        proto = Building_pb2.Building()
-
-        return proto
-
-    def export_paths(self, map_proto):
-        pass
-
-    def export_landmarks(self, map_proto):
-        pass
-
-
-
-    def get_maps(self, layers):
-        buildings = self.get_buildings(layers)
-        floors = self.get_floors(buildings, layers)
-        return self.build_map(buildings, floors)
-
-    def get_buildings(self, layers):
-        query = '"building" = \'yes\' and "name" <> \'NULL\''
-        buildings = {}
-
-        for layer in layers:
-            selection = layer.getFeatures(query)
-            for building in selection:
-                buildings[building['name']] = building
-        return buildings
-
-    def get_floors(self, buildings, layers):
-        query = '"indoor"<> \'NULL\''
-        floors = {}
-        for name, building in buildings.items():
-            if name is None:
-                continue
-            floors[name] = {}
-            for layer in layers:
-                selection = layer.getFeatures(query)
-                for feature in selection:
-                    if building.geometry().intersects(feature.geometry()) and building is not feature:
-                        level = int(feature['level'])
-                        if level in floors[name]:
-                            floors[name][level].append(feature)
-                        else:
-                            floors[name][level] = [feature]
-        return floors
-
-    def build_map(self, buildings, floors):
-        maps = []
-        for name, building in buildings.items():
-            buildingMap = self.new_building_map(building)
-            maps.append(buildingMap)
-            for key, floor in floors[name].items():
-                floorMap = buildingMap.floors.add()
-                floorMap.number = key
-                for feature in floor:
-                    self.add_feature(floorMap, feature)
-
-        return maps
-
-    def new_building_map(self, building):
-        buildingExtent = building.geometry().boundingBox()
-        buildingMap = Building_pb2.Building()
-        buildingMap.name = building['name'] or ""
-        buildingMap.minCoordinates.x = buildingExtent.xMinimum()
-        buildingMap.minCoordinates.y = buildingExtent.yMinimum()
-        buildingMap.maxCoordinates.x = buildingExtent.xMaximum()
-        buildingMap.maxCoordinates.y = buildingExtent.yMaximum()
-        return buildingMap
-
-    def add_feature(self, floorMap, feature):
-        """Adds a feature to the provided floor"""
-        geomType = feature.geometry().wkbType()
-
-        if geomType == QgsWkbTypes.MultiPolygon:
-            self.add_navigable_space(floorMap, feature)
-        elif (
-                geomType == QgsWkbTypes.LineGeometry and
-                feature['name'] is not None and
-                feature['type'] is not None
-        ):
-            self.add_landmark(floorMap, feature)
-        else:
-            pass
-
-    def add_navigable_space(self, floor, feature):
-        geom = feature.geometry().asMultiPolygon()[0][0]
-        navigable_space = floor.navigableSpaces.add()
-        for points in geom:
-            point = navigable_space.outerBoundary.add()
-            point.x = points.x()
-            point.y = points.y()
-
-    def add_landmark(self, floor, feature):
-        geom = feature.geometry().asPoint()
-        landmark = floor.landmarks.add()
-        landmark.name = feature['name']
-        landmark.location.x = geom[0]
-        landmark.location.y = geom[1]
-        if feature['type'] == 'DOOR':
-            landmark.type = 1
-        elif feature['type'] == 'HALLWAY_INTERSECTION':
-            landmark.type = 2
-        elif feature['type'] == 'STAIRS':
-            landmark.type = 3
-        elif feature['type'] == 'ELEVATOR':
-            landmark.type = 4

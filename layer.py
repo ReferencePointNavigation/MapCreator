@@ -12,6 +12,7 @@ class Layer(object):
     def __init__(self, name, geom_type, crs):
         self.crs = crs
         self.query = None
+        self.filter = QgsFeatureRequest()
         fields = [
             'name:string(25)',
             'level:integer'
@@ -24,6 +25,8 @@ class Layer(object):
 
         path = '{0}?crs=epsg:{1}&field={2}'.format(geom_type, self.crs, '&field='.join(self.fields))
         self.layer = QgsVectorLayer(path, name, 'memory')
+        self.layer.setDefaultValueDefinition(0, QgsDefaultValue('\'New {0}\''.format(name[:-1])))
+        self.layer.setDefaultValueDefinition(1, QgsDefaultValue('0'))
 
     def add_to_group(self, group):
         return group.addLayer(self.layer)
@@ -31,31 +34,24 @@ class Layer(object):
     def start_editing(self):
         self.layer.startEditing()
 
-    def get_features(self):
-        if self.query is not None:
-            return self.layer.getFeatures(QgsFeatureRequest().setFilterExpression(self.query))
-        else:
-            return self.layer.getFeatures()
+    def get_features(self, query=None, bbox=None):
+        if bbox is not None:
+            self.filter.setFilterRect(bbox)
+        if query is not None:
+            self.filter.setFilterExpression(self.query)
+        elif self.query is not None:
+            self.filter.setFilterExpression(self.query)
+
+        return self.layer.getFeatures(self.filter)
 
     def transform(self, point, src=None, dest='4326'):
         if src is None:
             src = self.crs
-        tf= QgsCoordinateTransform(
+        tf = QgsCoordinateTransform(
             QgsCoordinateReferenceSystem("EPSG:" + src),
             QgsCoordinateReferenceSystem("EPSG:" + dest),
             QgsProject.instance())
         return tf.transform(point)
-
-    def transform_polygon(self, polygon, src=None, dest='4326'):
-        if src is None:
-            src = self.crs
-        tf= QgsCoordinateTransform(
-            QgsCoordinateReferenceSystem("EPSG:" + src),
-            QgsCoordinateReferenceSystem("EPSG:" + dest),
-            QgsProject.instance())
-        tf.transformPolygon(polygon)
-        return polygon
-
 
 
 class LayerFactory:
@@ -79,7 +75,7 @@ class BuildingLayer(Layer):
 
 class LandmarkLayer(Layer):
     def __init__(self, crs):
-        self.fields = ['indoor:string(25)', 'type:string(12)']
+        self.fields = ['indoor:string(25)', 'type:integer']
         super().__init__(u'Landmarks', 'Point', crs)
         self.layer.setEditorWidgetSetup(3,
             QgsEditorWidgetSetup("ValueMap",
@@ -88,6 +84,7 @@ class LandmarkLayer(Layer):
                     {'HALLWAY_INTERSECTION': '2'},
                     {'STAIRS': '3'},
                     {'ELEVATOR':'4'}]}))
+        self.layer.setDefaultValueDefinition(3, QgsDefaultValue('1'))
 
 
 class PathLayer(Layer):
@@ -97,7 +94,6 @@ class PathLayer(Layer):
 
 class RoomLayer(Layer):
     def __init__(self, crs):
-        self.fields = ['indoor:string(25)']
+        #self.fields = ['indoor:string(25)']
         super().__init__(u'Rooms', 'Polygon', crs)
-        self.query = '"indoor"<> \'NULL\''
-        self.layer.setDefaultValueDefinition(2, QgsDefaultValue('\'yes\''))
+        #self.query = '"indoor"<> \'NULL\''
