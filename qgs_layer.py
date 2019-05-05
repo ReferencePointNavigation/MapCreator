@@ -11,8 +11,6 @@ from qgis.core import (
     QgsPointXY
 )
 
-import qgis.utils
-
 class Layer(object):
 
     def __init__(self, name, geom_type, crs):
@@ -44,7 +42,7 @@ class Layer(object):
         if bbox is not None:
             self.filter.setFilterRect(bbox)
         if query is not None:
-            self.filter.setFilterExpression(self.query)
+            self.filter.setFilterExpression(query)
         elif self.query is not None:
             self.filter.setFilterExpression(self.query)
 
@@ -72,13 +70,6 @@ class LayerFactory:
 
     def new_layers(self, crs='3857'):
 
-        try:
-            olplugin = qgis.utils.plugins['openlayers_plugin']
-            ol_gphyslayertype = olplugin._olLayerTypeRegistry.getById(4)
-            olplugin.addLayer(ol_gphyslayertype)
-        except KeyError:
-            pass
-
         return {
             'landmarks': LandmarkLayer(crs),
             'paths': PathLayer(crs),
@@ -99,6 +90,7 @@ class BuildingLayer(Layer):
         points = [self.transform(QgsPointXY(c.x, c.y), src='4326', dest='3857') for c in geom]
         feature.setGeometry(QgsGeometry.fromPolygonXY([points]))
         feature['name'] = name
+        feature['building'] = 'yes'
         self.layer.dataProvider().addFeatures([feature])
         return feature
 
@@ -107,6 +99,14 @@ class LandmarkLayer(Layer):
     def __init__(self, crs):
         self.fields = ['indoor:string(25)', 'type:integer']
         super().__init__(u'Landmarks', 'Point', crs)
+
+        self.layer.setEditorWidgetSetup(2,
+            QgsEditorWidgetSetup("ValueMap",
+                {'map': [
+                    {'yes': 'yes'},
+                    {'no': 'no'}]}))
+        self.layer.setDefaultValueDefinition(2, QgsDefaultValue('\'yes\''))
+
         self.layer.setEditorWidgetSetup(3,
             QgsEditorWidgetSetup("ValueMap",
                 {'map': [
@@ -146,4 +146,5 @@ class RoomLayer(Layer):
         feature.setGeometry(QgsGeometry.fromPolygonXY([points]))
         self.layer.dataProvider().addFeatures([feature])
         return feature
+
 

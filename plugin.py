@@ -11,15 +11,17 @@
         email                : chebizarro@gmail.com
  ***************************************************************************/
 """
-import os, sys
+import os
 from referencepoint import MapBuilder, MapView
-from .layer import LayerFactory
+from .qgs_layer import LayerFactory
+from .qgs_map import QgsMap
 from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction, QFileDialog, QDialog, QInputDialog, QLineEdit
 
 from qgis.core import QgsProject, QgsVectorLayer, QgsFeatureRequest
 from qgis.utils import showPluginHelp
+import qgis.utils
 # Initialize Qt resources from file resources.py
 from .resources import *
 # Import the code for the dialog
@@ -55,8 +57,9 @@ class Plugin:
         self.toolbar.setObjectName(u'MapBuilder')
         self.resource_path = ':/plugins/map_builder/resources/'
 
+        self.map = QgsMap(self.tr(u'Untitled'), LayerFactory())
         self.view = MapView(self, QgsProject.instance())
-        self.controller = MapBuilder(self.view, LayerFactory())
+        self.controller = MapBuilder(self.view, self.map)
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -186,6 +189,15 @@ class Plugin:
 
     def set_add_feature(self):
         self.iface.actionAddFeature().trigger()
+
+    def show_basemap(self):
+        try:
+            olplugin = qgis.utils.plugins['openlayers_plugin']
+            ol_gphyslayertype = olplugin._olLayerTypeRegistry.getById(4)
+            olplugin.addLayer(ol_gphyslayertype)
+        except KeyError:
+            pass
+
 
     def unload(self):
         """Disconnect the LayerChanged Signal"""

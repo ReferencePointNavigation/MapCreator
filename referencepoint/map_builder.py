@@ -1,4 +1,5 @@
-from .map import Map
+import os, zipfile
+
 from .map_importer import MapImporter
 from .map_exporter import MapExporter
 
@@ -9,21 +10,30 @@ class MapBuilder:
     """
     map = None
 
-    def __init__(self, view, layer_factory):
+    def __init__(self, view, map):
         self.view = view
         self.view.set_controller(self)
-        self.layer_factory = layer_factory
+        self.map = map
 
     def import_map(self, file):
         importer = MapImporter(self.map)
         importer.import_map(file)
 
     def new_map(self, name):
-        self.map = Map(name)
-        layers = self.layer_factory.new_layers()
-        self.map.add_layers(layers)
-        self.view.add_layers(layers.values())
+        self.map.new_map(name)
+        self.view.add_layers(self.map.get_layers().values())
 
     def save_map(self, filepath):
         exporter = MapExporter(self.map)
-        exporter.export_map(filepath)
+
+        files = exporter.export_map(filepath)
+
+        filename = os.path.join(filepath, self.map.get_name().replace(' ', '_'))
+        zf = zipfile.ZipFile(filename + '.rpn', mode='w')
+
+        zf.writestr(filename + '.map', files[0].SerializeToString())
+
+        for building in files[1]:
+            zf.writestr(building.name.replace(' ', '_') + '.bldg', building.SerializeToString())
+
+        zf.close()

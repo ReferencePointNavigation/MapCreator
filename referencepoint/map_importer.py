@@ -34,17 +34,23 @@ class MapImporter:
         self.map.name = map_proto.name
 
         for bldg, poly in map_proto.buildings.items():
-            self.map.layers['buildings'].add_feature(bldg, poly.vertices)
+            self.map.add_feature('buildings', bldg, poly.vertices)
             bldg_data = zf.read(bldg.replace(' ', '_') + '.bldg')
             bldg_proto = Building_pb2.Building()
             bldg_proto.ParseFromString(bldg_data)
             self.import_building(bldg_proto)
 
+        for landmark in map_proto.landmarks:
+            feature = self.map.add_feature('landmarks', landmark.name, landmark.location)
+            feature['indoor'] = 'no'
+
     def import_building(self, building):
         for floor in building.floors:
             for landmark in floor.landmarks:
-                self.map.layers['landmarks'].add_feature(landmark.name, landmark.location)
+                lm = self.map.add_feature('landmarks', landmark.name, landmark.location)
+                lm['indoor'] = 'yes'
+                lm['level'] = str(floor.number)
 
             for room in floor.navigableSpaces:
-                rm = self.map.layers['rooms'].add_feature('', room.outerBoundary)
-                rm['level'] = floor.number
+                rm = self.map.add_feature('rooms', '', room.outerBoundary)
+                rm['level'] = str(floor.number)

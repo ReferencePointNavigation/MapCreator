@@ -26,7 +26,7 @@ __copyright__ = (
 import logging
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
 from qgis.core import QgsMapLayerRegistry
-from qgis.gui import QgsMapCanvasLayer
+from qgis.gui import QgsMapCanvasLayer, QgsMessageBar
 LOGGER = logging.getLogger('QGIS')
 
 
@@ -45,6 +45,7 @@ class QgisInterface(QObject):
         """
         QObject.__init__(self)
         self.canvas = canvas
+        self.messageBar = QgsMessageBar
         # Set up slots so we can mimic the behaviour of QGIS when layers
         # are added.
         LOGGER.debug('Initialising canvas...')
@@ -203,3 +204,6 @@ class QgisInterface(QObject):
     def legendInterface(self):
         """Get the legend."""
         return self.canvas
+
+    def addPluginToVectorMenu(self, menu, action):
+        pass

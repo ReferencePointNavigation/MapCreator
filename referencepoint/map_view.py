@@ -79,6 +79,7 @@ class MapView:
 
     def new_map(self, mapname):
         self.project.clear()
+        self.plugin.show_basemap()
         self.current = None
         self.layers = dict()
         self.group = self.project.layerTreeRoot().insertGroup(0, mapname)
@@ -90,6 +91,7 @@ class MapView:
         if self.group is not None:
             for layer in layers:
                 self.layers[layer.name] = layer.add_to_group(self.group)
+                self.layers[layer.name].setCustomProperty("showFeatureCount", True)
 
     def open_action(self):
         title = self.plugin.tr(u'Open File')
@@ -102,7 +104,7 @@ class MapView:
     def save_action(self):
         title = self.plugin.tr(u'Select Directory')
         filepath = self.plugin.show_save_folder_dialog(title)
-        if filepath is not '':
+        if filepath is not None:
             if self.current is not None:
                 self.current.layer().commitChanges()
             self.controller.save_map(filepath)
