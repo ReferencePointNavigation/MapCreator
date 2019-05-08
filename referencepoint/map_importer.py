@@ -24,20 +24,18 @@ class MapImporter:
         """
         self.map = map
 
-    def import_map(self, file):
-        zf = zipfile.ZipFile(file)
-        f, _ = os.path.splitext(os.path.basename(file))
-        data = zf.read(f + '.map')
+    def import_map(self, files):
 
         map_proto = Map_pb2.Map()
-        map_proto.ParseFromString(data)
+        map_proto.ParseFromString(files[0])
         self.map.name = map_proto.name
 
         for bldg, poly in map_proto.buildings.items():
             self.map.add_feature('buildings', bldg, poly.vertices)
-            bldg_data = zf.read(bldg.replace(' ', '_') + '.bldg')
+
+        for bldg in files[1]:
             bldg_proto = Building_pb2.Building()
-            bldg_proto.ParseFromString(bldg_data)
+            bldg_proto.ParseFromString(bldg)
             self.import_building(bldg_proto)
 
         for landmark in map_proto.landmarks:

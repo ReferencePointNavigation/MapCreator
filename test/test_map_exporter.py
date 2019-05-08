@@ -9,7 +9,6 @@ __date__ = '2019-05-04'
 __copyright__ = 'Copyright 2019, Chris Daley'
 
 
-import sys
 import unittest
 from unittest.mock import Mock
 from referencepoint import MapExporter
@@ -37,7 +36,7 @@ class MapExporterTest(unittest.TestCase):
         b1.get_name.return_value = 'Test Building'
         b1.get_geometry.return_value = [
             MockPoint((155.87851779766901927, -1.85569664044845695)),
-            MockPoint((154.64138670403667675, 240.62199771148107175)),
+            MockPoint((154.641386704023667675, 240.62199771148107175)),
             MockPoint((385.98490121327563429, 238.14773552421650038)),
             MockPoint((387.22203230690774944, -6.80422101497759968)),
             MockPoint((155.87851779766901927, -1.85569664044845695))
@@ -78,7 +77,7 @@ class MapExporterTest(unittest.TestCase):
         f1.get_landmarks.return_value = [lm1]
 
         exporter = MapExporter(test_map)
-        files = exporter.export_map('./')
+        files = exporter.export_map()
 
         assert files[0].name == 'Test'
         assert len(files[0].buildings) == 1

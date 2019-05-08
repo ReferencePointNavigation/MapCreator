@@ -33,7 +33,7 @@ class MapExporter:
         """
         self.map = map
 
-    def export_map(self, filepath):
+    def export_map(self):
         """
         Export the map to the given file path
         :param filepath: a directory to store the zipped Map files
@@ -69,6 +69,7 @@ class MapExporter:
     @staticmethod
     def __export_buildings(building):
         bldg = Building_pb2.Building()
+        bldg.name = building.get_name()
         for floor in building.get_floors():
             flr = bldg.floors.add()
             flr.number = floor.get_number()

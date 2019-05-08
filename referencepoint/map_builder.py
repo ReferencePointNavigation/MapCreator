@@ -16,6 +16,13 @@ class MapBuilder:
         self.map = map
 
     def import_map(self, file):
+
+        zf = zipfile.ZipFile(file)
+        f, _ = os.path.splitext(os.path.basename(file))
+
+        data = zf.read(f + '.map')
+
+
         importer = MapImporter(self.map)
         importer.import_map(file)
 
