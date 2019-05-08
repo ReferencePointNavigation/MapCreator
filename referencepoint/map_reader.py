@@ -4,12 +4,11 @@ import zipfile
 
 class MapReader:
 
-    def __init__(self, map, filepath):
+    def __init__(self, map, file):
         self.map = map
-        self.filepath = filepath
-        self.filename = os.path.join(filepath, self.map.get_name().replace(' ', '_'))
-        self.zf = zipfile.ZipFile(self.filename)
-        self.filename, _ = os.path.splitext(os.path.basename(self.filename))
+        self.file = file
+        self.filename = self.map.get_name().replace(' ', '_')
+        self.zf = zipfile.ZipFile(self.file)
 
     def get_map(self):
         map_data = self.zf.read(self.filename + '.map')

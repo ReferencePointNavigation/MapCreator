@@ -31,22 +31,27 @@ class MapImporter:
         self.map.name = map_proto.name
 
         for bldg, poly in map_proto.buildings.items():
-            self.map.add_feature('buildings', bldg, poly.vertices)
+            self.map.add_feature('buildings', {'name': bldg}, poly.vertices)
             bldg_proto = Building_pb2.Building()
             bldg_proto.ParseFromString(self.reader.get_building(bldg))
             self.import_building(bldg_proto)
 
         for landmark in map_proto.landmarks:
-            feature = self.map.add_feature('landmarks', landmark.name, landmark.location)
-            feature['indoor'] = 'no'
+            self.map.add_feature('landmarks', {
+                'name': landmark.name,
+                'indoor': 'no',
+                'type': str(landmark.type)
+            }, landmark.location)
 
     def import_building(self, building):
         for floor in building.floors:
             for landmark in floor.landmarks:
-                lm = self.map.add_feature('landmarks', landmark.name, landmark.location)
-                lm['indoor'] = 'yes'
-                lm['level'] = str(floor.number)
+                self.map.add_feature('landmarks', {
+                    'name': landmark.name,
+                    'indoor': 'yes',
+                    'level': str(floor.number),
+                    'type': str(landmark.type)
+                }, landmark.location)
 
             for room in floor.navigableSpaces:
-                rm = self.map.add_feature('rooms', '', room.outerBoundary)
-                rm['level'] = str(floor.number)
+                self.map.add_feature('rooms', {'level': str(floor.number)}, room.outerBoundary)

@@ -57,7 +57,7 @@ class Layer(object):
             QgsProject.instance())
         return tf.transform(point)
 
-    def add_feature(self, name, geom):
+    def add_feature(self, fields, geom):
         return None
 
     def new_feature(self):
@@ -85,11 +85,12 @@ class BuildingLayer(Layer):
         self.query = '"building" = \'yes\' and "name" <> \'NULL\''
         self.layer.setDefaultValueDefinition(2, QgsDefaultValue('\'yes\''))
 
-    def add_feature(self, name, geom):
+    def add_feature(self, fields, geom):
         feature = self.new_feature()
         points = [self.transform(QgsPointXY(c.x, c.y), src='4326', dest='3857') for c in geom]
         feature.setGeometry(QgsGeometry.fromPolygonXY([points]))
-        feature['name'] = name
+        for name, value in fields.items():
+            feature[name] = value
         feature['building'] = 'yes'
         self.layer.dataProvider().addFeatures([feature])
         return feature
@@ -116,7 +117,7 @@ class LandmarkLayer(Layer):
                     {'ELEVATOR':'4'}]}))
         self.layer.setDefaultValueDefinition(3, QgsDefaultValue('1'))
 
-    def add_feature(self, name, geom):
+    def add_feature(self, fields, geom):
         feature = self.new_feature()
         feature.setGeometry(
             QgsGeometry.fromPointXY(
@@ -126,7 +127,8 @@ class LandmarkLayer(Layer):
                     dest='3857')
             )
         )
-        feature['name'] = name
+        for name, value in fields.items():
+            feature[name] = value
         self.layer.dataProvider().addFeatures([feature])
         return feature
 
@@ -140,9 +142,11 @@ class RoomLayer(Layer):
     def __init__(self, crs):
         super().__init__(u'Rooms', 'Polygon', crs)
 
-    def add_feature(self, name, geom):
+    def add_feature(self, fields, geom):
         feature = self.new_feature()
         points = [self.transform(QgsPointXY(c.x, c.y), src='4326', dest='3857') for c in geom]
+        for name, value in fields.items():
+            feature[name] = value
         feature.setGeometry(QgsGeometry.fromPolygonXY([points]))
         self.layer.dataProvider().addFeatures([feature])
         return feature

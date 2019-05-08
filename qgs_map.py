@@ -52,5 +52,5 @@ class QgsMap:
     def get_layers(self):
         return self.__layers
 
-    def add_feature(self, layer, name, geom):
-        return self.__layers[layer].add_feature(name, geom)
+    def add_feature(self, layer, fields, geom):
+        return self.__layers[layer].add_feature(fields, geom)

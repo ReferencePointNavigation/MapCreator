@@ -59,6 +59,7 @@ class MapExporterTest(unittest.TestCase):
         ]
 
         f1.get_rooms.return_value = [r1]
+        f1.contains.side_effect = [False, True]
 
         bb = Mock()
         bb.xMinimum.return_value = 0.1

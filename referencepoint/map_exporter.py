@@ -40,13 +40,15 @@ class MapExporter:
         map_proto = Map_pb2.Map()
         map_proto.name = self.map.get_name()
 
+        buildings = {}
+
         for building in self.map.get_buildings():
             for points in building.get_geometry():
                 point = map_proto.buildings[building.get_name()].vertices.add()
                 point.x = points.x()
                 point.y = points.y()
             bldg = MapExporter.__export_buildings(building)
-            self.writer.add_building(building.get_name(), bldg.SerializeToString())
+            buildings[building.get_name()] = bldg.SerializeToString()
 
         for landmark in self.map.get_landmarks():
             lm = map_proto.landmarks.add()
@@ -60,6 +62,10 @@ class MapExporter:
             #p = map_proto.paths.add()
 
         self.writer.add_map(map_proto.SerializeToString())
+
+        for name, building in buildings.items():
+            self.writer.add_building(name, building)
+
         self.writer.close()
 
     @staticmethod
@@ -68,7 +74,7 @@ class MapExporter:
         bldg.name = building.get_name()
         for floor in building.get_floors():
             flr = bldg.floors.add()
-            flr.number = floor.get_number()
+            flr.number = int(floor.get_number())
             for room in floor.get_rooms():
                 rm = flr.navigableSpaces.add()
                 for points in room.get_geometry():
@@ -83,7 +89,7 @@ class MapExporter:
                 lm.location.x = point.x()
                 lm.location.y = point.y()
                 MapExporter.__generate_particles(floor, lm)
-            MapExporter.__generate_minimap(floor, flr, TILE_SIZE)
+            #MapExporter.__generate_minimap(floor, flr, TILE_SIZE)
         return bldg
 
     @staticmethod
@@ -148,7 +154,6 @@ class MapExporter:
                                 floor,
                                 floor_proto,
                                 ty, tile):
-                            QgsMessageLog.logMessage('WTF?: {}'.format(lm), 'RPN', level=Qgis.Info)
                             tileBuilder.landmarks.append(lm)
                 curr_x += tile_size
             curr_y += tile_size

@@ -34,9 +34,6 @@ class MapImporterTest(unittest.TestCase):
         test_map.get_name.return_value = 'Test'
 
         m = MagicMock()
-        d = {'level': ''}
-        m.__getitem__.side_effect = d.__getitem__
-        m.__iter__.side_effect = d.__iter__
 
         test_map.add_feature.return_value = m
 
