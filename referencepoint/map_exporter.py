@@ -8,16 +8,12 @@ if protos_path not in sys.path:
 
 from referencepoint.proto import Map_pb2, Building_pb2
 
-from qgis.core import (
-    QgsMessageLog,
-    Qgis
-)
-
 TILE_SIZE = 1.0
 NUM_OF_MINIMAP_TILE_LANDMARKS = 5
 MAX_LANDMARK_DISTANCE = 20.0
 NUM_OF_PARTICLES_PER_LANDMARK = 10
 NUM_LANDMARK_TYPE = 5
+
 
 class MapExporter:
     """
@@ -25,13 +21,15 @@ class MapExporter:
     representation and bundles them together in a zip file with the
     .rpn extension
     """
-    def __init__(self, map):
+    def __init__(self, map, writer):
         """
         Constructor
         :param map: A Reference Point Map
         :type map: Map
+        :param writer: A MapWriter
         """
         self.map = map
+        self.writer = writer
 
     def export_map(self):
         """
@@ -39,11 +37,8 @@ class MapExporter:
         :param filepath: a directory to store the zipped Map files
         :type  filepath: str
         """
-
         map_proto = Map_pb2.Map()
         map_proto.name = self.map.get_name()
-
-        buildings = []
 
         for building in self.map.get_buildings():
             for points in building.get_geometry():
@@ -51,7 +46,7 @@ class MapExporter:
                 point.x = points.x()
                 point.y = points.y()
             bldg = MapExporter.__export_buildings(building)
-            buildings.append(bldg)
+            self.writer.add_building(building.get_name(), bldg.SerializeToString())
 
         for landmark in self.map.get_landmarks():
             lm = map_proto.landmarks.add()
@@ -64,7 +59,8 @@ class MapExporter:
         #for path in self.map.get_paths():
             #p = map_proto.paths.add()
 
-        return (map_proto, buildings)
+        self.writer.add_map(map_proto.SerializeToString())
+        self.writer.close()
 
     @staticmethod
     def __export_buildings(building):

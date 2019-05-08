@@ -1,7 +1,6 @@
 """
 Imports Map definition from Protobuf files
 """
-import zipfile
 import os, sys
 
 protos_path = os.path.join(os.path.dirname(__file__), 'proto')
@@ -16,26 +15,25 @@ class MapImporter:
     The MapImporter class deserializes the the Protobuf representation
     from a zip file with the .rpn extension
     """
-    def __init__(self, map):
+    def __init__(self, map, reader):
         """
         Constructor
         :param map: A Reference Point Map
         :type map: Map
         """
         self.map = map
+        self.reader = reader
 
-    def import_map(self, files):
+    def import_map(self):
 
         map_proto = Map_pb2.Map()
-        map_proto.ParseFromString(files[0])
+        map_proto.ParseFromString(self.reader.get_map())
         self.map.name = map_proto.name
 
         for bldg, poly in map_proto.buildings.items():
             self.map.add_feature('buildings', bldg, poly.vertices)
-
-        for bldg in files[1]:
             bldg_proto = Building_pb2.Building()
-            bldg_proto.ParseFromString(bldg)
+            bldg_proto.ParseFromString(self.reader.get_building(bldg))
             self.import_building(bldg_proto)
 
         for landmark in map_proto.landmarks:

@@ -12,7 +12,8 @@
  ***************************************************************************/
 """
 import os
-from referencepoint import MapBuilder, MapView
+from .referencepoint.map_builder import MapBuilder
+from .referencepoint.map_view import MapView
 from .qgs_layer import LayerFactory
 from .qgs_map import QgsMap
 from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication

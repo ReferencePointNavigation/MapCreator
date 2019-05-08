@@ -24,7 +24,8 @@ class MapImporterTest(unittest.TestCase):
 
     def test_new_map_importer(self):
         test_map = Mock()
-        exporter = MapImporter(test_map)
+        reader = Mock()
+        exporter = MapImporter(test_map, reader)
         assert exporter is not None
 
     def test_map_exporter_export(self):
@@ -63,8 +64,12 @@ class MapImporterTest(unittest.TestCase):
         lm.location.x = point[0]
         lm.location.y = point[1]
 
-        importer = MapImporter(test_map)
-        importer.import_map((map_proto.SerializeToString(), [bldg.SerializeToString()]))
+        reader = Mock()
+        reader.get_map.return_value = map_proto.SerializeToString()
+        reader.get_building.return_value = bldg.SerializeToString()
+
+        importer = MapImporter(test_map, reader)
+        importer.import_map()
 
         calls = [
             call('buildings', 'Test Building', map_proto.buildings['Test Building'].vertices),
