@@ -48,15 +48,6 @@ class Layer(object):
 
         return self.layer.getFeatures(self.filter)
 
-    def transform(self, point, src=None, dest='4326'):
-        if src is None:
-            src = self.crs
-        tf = QgsCoordinateTransform(
-            QgsCoordinateReferenceSystem("EPSG:" + src),
-            QgsCoordinateReferenceSystem("EPSG:" + dest),
-            QgsProject.instance())
-        return tf.transform(point)
-
     def add_feature(self, fields, geom):
         return None
 
@@ -65,6 +56,9 @@ class Layer(object):
         f.setFields(self.layer.fields())
         return f
 
+    def set_crs(self, crs):
+        self.crs = crs
+        self.layer.setCrs(QgsCoordinateReferenceSystem(crs))
 
 class LayerFactory:
 
@@ -87,7 +81,7 @@ class BuildingLayer(Layer):
 
     def add_feature(self, fields, geom):
         feature = self.new_feature()
-        points = [self.transform(QgsPointXY(c.x, c.y), src='4326', dest='3857') for c in geom]
+        points = [QgsPointXY(c.x, c.y) for c in geom]
         feature.setGeometry(QgsGeometry.fromPolygonXY([points]))
         for name, value in fields.items():
             feature[name] = value
@@ -119,13 +113,9 @@ class LandmarkLayer(Layer):
 
     def add_feature(self, fields, geom):
         feature = self.new_feature()
+        point = QgsPointXY(geom.x, geom.y)
         feature.setGeometry(
-            QgsGeometry.fromPointXY(
-                self.transform(
-                    QgsPointXY(geom.x, geom.y),
-                    src='4326',
-                    dest='3857')
-            )
+            QgsGeometry.fromPointXY(point)
         )
         for name, value in fields.items():
             feature[name] = value
@@ -144,7 +134,7 @@ class RoomLayer(Layer):
 
     def add_feature(self, fields, geom):
         feature = self.new_feature()
-        points = [self.transform(QgsPointXY(c.x, c.y), src='4326', dest='3857') for c in geom]
+        points = [QgsPointXY(c.x, c.y) for c in geom]
         for name, value in fields.items():
             feature[name] = value
         feature.setGeometry(QgsGeometry.fromPolygonXY([points]))

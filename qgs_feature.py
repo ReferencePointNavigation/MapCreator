@@ -14,27 +14,24 @@ from qgis.core import (
 
 class Feature(object):
 
-    def __init__(self, layer, feature=None):
-        self.layer = layer
+    def __init__(self, feature=None, fields=None):
         self.f = feature
         if feature is None:
             self.f = QgsFeature()
-            self.f.setFields(self.layer.fields())
+            self.f.setFields(fields)
 
     def get_name(self):
-        #if 'name' in self.f.fields():
         return self.f['name']
-        #else:
-        #   return ''
 
     def get_bounding_box(self):
         return self.f.geometry().boundingBox()
 
-    def get_geometry(self, dest='4326'):
+    def get_geometry(self):
         pass
 
     def get_feature(self):
         return self.f
+
 
 class Building(Feature):
 
@@ -48,16 +45,18 @@ class Building(Feature):
     def get_floors(self):
         return self.__floors
 
-    def get_geometry(self, dest='4326'):
-        return [self.layer.transform(p) for p in self.f.geometry().asPolygon()[0]]
+    def get_geometry(self):
+        return [p for p in self.f.geometry().asPolygon()[0]]
 
 
 class Floor:
-    def __init__(self, number):
+    def __init__(self, number, layer):
         self.__number = number
         self.__rooms = []
         self.__landmarks = []
         self.__geom = None
+        self.__layer = layer
+
 
     def get_number(self):
         return self.__number
@@ -84,11 +83,15 @@ class Floor:
         return self.__geom.boundingBox()
 
     def intersects(self, geom):
-        points = [QgsPointXY(c[0], c[1]) for c in geom]
-        return self.__geom.intersects(QgsGeometry.fromPolylineXY(points))
+        points = QgsGeometry.fromPolylineXY(
+            [QgsPointXY(p[0], p[1]) for p in geom])
+        valid = self.__geom.intersects(points)
+        return valid
 
     def contains(self, geom):
-        return self.__geom.contains(QgsGeometry.fromPointXY(QgsPointXY(geom[0], geom[1])))
+        point = QgsGeometry.fromPointXY(QgsPointXY(geom[0], geom[1]))
+        valid = self.__geom.contains(point)
+        return valid
 
 
 class Landmark(Feature):
@@ -96,8 +99,8 @@ class Landmark(Feature):
     def get_type(self):
         return int(self.f['type'])
 
-    def get_geometry(self, dest='4326'):
-        return self.layer.transform(self.f.geometry().asPoint())
+    def get_geometry(self):
+        return self.f.geometry().asPoint()
 
 
 class Path(Feature):
@@ -106,7 +109,7 @@ class Path(Feature):
 
 class Room(Feature):
 
-    def get_geometry(self, dest='4326'):
-        return [self.layer.transform(p) for p in self.f.geometry().asPolygon()[0]]
+    def get_geometry(self):
+        return [p for p in self.f.geometry().asPolygon()[0]]
 
 

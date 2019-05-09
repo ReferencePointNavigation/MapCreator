@@ -28,6 +28,11 @@ from .resources import *
 # Import the code for the dialog
 import os.path
 
+import pydevd_pycharm
+
+pydevd_pycharm.settrace('localhost', port=12345, stdoutToServer=True, stderrToServer=True)
+
+
 class Plugin:
     """QGIS Plugin Implementation."""
     def __init__(self, iface):

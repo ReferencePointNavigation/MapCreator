@@ -1,10 +1,5 @@
 from .qgs_feature import Building, Floor, Room, Landmark, Path
 
-from qgis.core import (
-    QgsMessageLog,
-    Qgis
-)
-
 
 class QgsMap:
 
@@ -22,20 +17,20 @@ class QgsMap:
 
     def get_buildings(self):
         layer = self.__layers['buildings']
-        buildings = [Building(layer, b) for b in layer.get_features()]
+        buildings = [Building(b, layer.fields) for b in layer.get_features()]
         for building in buildings:
             floors_layer = self.__layers['rooms']
             bbox = building.get_bounding_box()
             floor_nos = sorted(set([f['level'] for f in floors_layer.get_features(bbox=bbox)]))
-            floors = [Floor(f) for f in floor_nos]
+            floors = [Floor(f, floors_layer) for f in floor_nos]
             building.add_floors(floors)
             for floor in floors:
                 query = '"level" = {}'.format(floor.get_number())
-                rooms = [Room(floors_layer, r) for r in floors_layer.get_features(bbox=bbox)]
+                rooms = [Room(r, floors_layer.fields) for r in floors_layer.get_features(bbox=bbox)]
                 floor.add_rooms(rooms)
-                llayer = self.__layers['landmarks']
+                lm_layer = self.__layers['landmarks']
                 query += ' and "indoor" = \'yes\''
-                landmarks = [Landmark(llayer, l) for l in llayer.get_features(bbox=bbox)]
+                landmarks = [Landmark(l, lm_layer.fields) for l in lm_layer.get_features(bbox=bbox)]
                 floor.add_landmarks(landmarks)
 
         return buildings
@@ -54,3 +49,7 @@ class QgsMap:
 
     def add_feature(self, layer, fields, geom):
         return self.__layers[layer].add_feature(fields, geom)
+
+    def set_crs(self, crs):
+        for name, layer in self.__layers.items():
+            layer.set_crs(crs)

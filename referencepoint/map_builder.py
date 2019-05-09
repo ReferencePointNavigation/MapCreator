@@ -19,10 +19,14 @@ class MapBuilder:
 
     def import_map(self, file):
         reader = MapReader(self.map, file)
+        self.map.set_crs(4326)
         importer = MapImporter(self.map, reader)
         importer.import_map()
+        self.map.set_crs(3857)
 
     def save_map(self, filepath):
         writer = MapWriter(self.map.get_name(), filepath)
+        self.map.set_crs(4326)
         exporter = MapExporter(self.map, writer)
         exporter.export_map()
+        self.map.set_crs(3857)

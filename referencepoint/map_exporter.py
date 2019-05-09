@@ -88,32 +88,34 @@ class MapExporter:
                 lm.type = landmark.get_type()
                 lm.location.x = point.x()
                 lm.location.y = point.y()
-                MapExporter.__generate_particles(floor, lm)
-            #MapExporter.__generate_minimap(floor, flr, TILE_SIZE)
+                MapExporter.__generate_particles(floor, landmark, lm)
+            MapExporter.__generate_minimap(floor, flr, TILE_SIZE)
         return bldg
 
     @staticmethod
-    def __generate_particles(floor, landmark):
+    def __generate_particles(floor, landmark, lm_proto):
         radius = 0.5
+        geom = landmark.get_geometry()
         while radius < 5.0:
             rect = [
-                (landmark.location.x - radius, landmark.location.y - radius),
-                (landmark.location.x + (2 * radius), landmark.location.y - radius),
-                (landmark.location.x + (2 * radius), landmark.location.y + (2 * radius)),
-                (landmark.location.x - radius, landmark.location.y + (2 * radius))
+                (geom.x() - radius, geom.y() - radius),
+                (geom.x() + (2 * radius), geom.y() - radius),
+                (geom.x() + (2 * radius), geom.y() + (2 * radius)),
+                (geom.x() - radius, geom.y() + (2 * radius))
             ]
             if floor.intersects(rect):
                 break
             radius += 0.5
+
         if radius > 5.0:
             pass
         else:
             for i in range(0, NUM_OF_PARTICLES_PER_LANDMARK):
                 x, y = 0.0, 0.0
                 while not floor.contains([x, y]):
-                    x = landmark.location.x + 2 * (random.random() - 0.5) * radius
-                    y = landmark.location.y + 2 * (random.random() - 0.5) * radius
-                particles = landmark.particles.add()
+                    x = geom.x() + 2 * (random.random() - 0.5) * radius
+                    y = geom.y() + 2 * (random.random() - 0.5) * radius
+                particles = lm_proto.particles.add()
                 particles.x = x
                 particles.y = y
 

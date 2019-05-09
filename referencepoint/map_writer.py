@@ -14,7 +14,7 @@ class MapWriter:
         self.zf.writestr(self.filename + '.map', map_data)
 
     def add_building(self, building_name, building_data):
-        if self.f is not None:
+        if self.zf is not None:
             self.zf.writestr(building_name.replace(' ', '_') + '.bldg', building_data)
 
     def close(self):
