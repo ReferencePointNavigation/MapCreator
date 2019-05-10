@@ -74,7 +74,7 @@ class MapExporter:
         bldg.name = building.get_name()
         for floor in building.get_floors():
             flr = bldg.floors.add()
-            flr.number = int(floor.get_number())
+            flr.number = floor.get_number()
             for room in floor.get_rooms():
                 rm = flr.navigableSpaces.add()
                 for points in room.get_geometry():
@@ -158,6 +158,7 @@ class MapExporter:
                                 ty, tile):
                             tileBuilder.landmarks.append(lm)
                 curr_x += tile_size
+            curr_x = minX
             curr_y += tile_size
 
     @staticmethod

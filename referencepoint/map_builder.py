@@ -1,6 +1,5 @@
-import os, zipfile
-
 from referencepoint import MapImporter, MapExporter, MapReader, MapWriter
+
 
 class MapBuilder:
     """

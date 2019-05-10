@@ -1,17 +1,18 @@
-from .UIInterface import UIInterface
 from PyQt5.QtWidgets import QAction, QActionGroup, QToolButton, QMenu
 from PyQt5.QtGui import QIcon
 from qgis.core import QgsVectorLayer, QgsProject, QgsFeatureRequest
+from .qgs_widget import QgsWidget
 
 
-class LevelMenu(UIInterface):
+class LevelMenuWidget(QgsWidget):
 
     def __init__(self, plugin):
         super().__init__(plugin)
-
-        icon = QIcon(self.plugin.resource_path + 'floors.svg')
+        self.plugin = plugin
+        icon = QIcon(self.plugin.get_resource('floors'))
 
         self.level_menu = QMenu()
+
         self.plugin.iface.currentLayerChanged.connect(self.layer_changed)
 
         self.level_menu_button = QToolButton(self.plugin.iface.mainWindow())

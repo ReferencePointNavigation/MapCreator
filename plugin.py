@@ -12,25 +12,22 @@
  ***************************************************************************/
 """
 import os
+
 from .referencepoint.map_builder import MapBuilder
 from .referencepoint.map_view import MapView
-from .qgs_layer import LayerFactory
-from .qgs_map import QgsMap
+from ui import LayerFactory, QgsMap, MiniMap
+
 from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction, QFileDialog, QDialog, QInputDialog, QLineEdit
 
-from qgis.core import QgsProject, QgsVectorLayer, QgsFeatureRequest
+from qgis.core import QgsProject
 from qgis.utils import showPluginHelp
 import qgis.utils
 # Initialize Qt resources from file resources.py
 from .resources import *
 # Import the code for the dialog
 import os.path
-
-import pydevd_pycharm
-
-pydevd_pycharm.settrace('localhost', port=12345, stdoutToServer=True, stderrToServer=True)
 
 
 class Plugin:
@@ -66,6 +63,7 @@ class Plugin:
         self.map = QgsMap(self.tr(u'Untitled'), LayerFactory())
         self.view = MapView(self, QgsProject.instance())
         self.controller = MapBuilder(self.view, self.map)
+        self.minimap = None
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -95,7 +93,9 @@ class Plugin:
         add_to_toolbar=True,
         status_tip=None,
         whats_this=None,
-        parent=None):
+        parent=None,
+        checked=False
+    ):
         """Add a toolbar icon to the toolbar.
 
         :param icon_path: Path to the icon for this action. Can be a resource
@@ -130,6 +130,9 @@ class Plugin:
         :param whats_this: Optional text to show in the status bar when the
             mouse pointer hovers over the action.
 
+        :param checked: whether the action should be checkable.
+            In the toolbar it will create a Toggle Button
+
         :returns: The action that was created. Note that the action is also
             added to self.actions list.
         :rtype: QAction
@@ -141,6 +144,7 @@ class Plugin:
         action = QAction(icon, text, parent)
         action.triggered.connect(callback)
         action.setEnabled(enabled_flag)
+        action.setCheckable(checked)
 
         if status_tip is not None:
             action.setStatusTip(status_tip)
@@ -166,6 +170,16 @@ class Plugin:
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
         self.view.show()
+
+    def show_minimap(self):
+        layer = self.iface.mapCanvas().currentLayer()
+        self.minimap = MiniMap(self.iface.mapCanvas(), self.map, 1.0)
+        self.minimap.set_enabled(True)
+        self.minimap.canvas.refresh()
+        # self.minimap.setVisible(True)
+        # self.minimap.setCrs(layer.crs())
+        # self.minimap.setPrecision(layer.geometryOptions().geometryPrecision())
+        # self.minimap.setEnabled(True)
 
     def show_open_dialog(self, title):
         qfd = QFileDialog()

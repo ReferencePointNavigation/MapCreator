@@ -1,11 +1,4 @@
 from qgis.core import (
-    QgsVectorLayer,
-    QgsFeatureRequest,
-    QgsDefaultValue,
-    QgsCoordinateTransform,
-    QgsCoordinateReferenceSystem,
-    QgsProject,
-    QgsEditorWidgetSetup,
     QgsFeature,
     QgsGeometry,
     QgsPointXY
@@ -44,6 +37,12 @@ class Building(Feature):
 
     def get_floors(self):
         return self.__floors
+
+    def get_floor(self, level):
+        for f in self.__floors:
+            if f.get_number() == level:
+                return f
+        return None
 
     def get_geometry(self):
         return [p for p in self.f.geometry().asPolygon()[0]]

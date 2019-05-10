@@ -2,13 +2,12 @@ from qgis.core import (
     QgsVectorLayer,
     QgsFeatureRequest,
     QgsDefaultValue,
-    QgsCoordinateTransform,
     QgsCoordinateReferenceSystem,
-    QgsProject,
     QgsEditorWidgetSetup,
     QgsFeature,
     QgsGeometry,
-    QgsPointXY
+    QgsPointXY,
+    QgsRectangle
 )
 
 class Layer(object):
@@ -16,6 +15,7 @@ class Layer(object):
     def __init__(self, name, geom_type, crs):
         self.crs = crs
         self.query = None
+        self.new_count = 0
         self.filter = QgsFeatureRequest()
         fields = [
             'name:string(25)',
@@ -29,7 +29,6 @@ class Layer(object):
 
         path = '{0}?crs=epsg:{1}&field={2}'.format(geom_type, self.crs, '&field='.join(self.fields))
         self.layer = QgsVectorLayer(path, name, 'memory')
-        self.layer.setDefaultValueDefinition(0, QgsDefaultValue('\'New {0}\''.format(name[:-1])))
         self.layer.setDefaultValueDefinition(1, QgsDefaultValue('0'))
 
     def add_to_group(self, group):
@@ -39,9 +38,14 @@ class Layer(object):
         self.layer.startEditing()
 
     def get_features(self, query=None, bbox=None):
+        self.filter.setFilterRect(QgsRectangle())
+
         if bbox is not None:
             self.filter.setFilterRect(bbox)
-        if query is not None:
+
+        if query is not None and self.query is not None:
+            self.filter.setFilterExpression('{0} and {1}'.format(self.query, query))
+        elif query is not None:
             self.filter.setFilterExpression(query)
         elif self.query is not None:
             self.filter.setFilterExpression(self.query)
@@ -49,6 +53,7 @@ class Layer(object):
         return self.layer.getFeatures(self.filter)
 
     def add_feature(self, fields, geom):
+        self.layer.setDefaultValueDefinition(0, QgsDefaultValue('\'New {0} {1}\''.format(self.name[:-1], self.new_count)))
         return None
 
     def new_feature(self):
@@ -80,6 +85,7 @@ class BuildingLayer(Layer):
         self.layer.setDefaultValueDefinition(2, QgsDefaultValue('\'yes\''))
 
     def add_feature(self, fields, geom):
+        super().add_feature(fields, geom)
         feature = self.new_feature()
         points = [QgsPointXY(c.x, c.y) for c in geom]
         feature.setGeometry(QgsGeometry.fromPolygonXY([points]))
@@ -112,6 +118,7 @@ class LandmarkLayer(Layer):
         self.layer.setDefaultValueDefinition(3, QgsDefaultValue('1'))
 
     def add_feature(self, fields, geom):
+        super().add_feature(fields, geom)
         feature = self.new_feature()
         point = QgsPointXY(geom.x, geom.y)
         feature.setGeometry(
@@ -133,6 +140,7 @@ class RoomLayer(Layer):
         super().__init__(u'Rooms', 'Polygon', crs)
 
     def add_feature(self, fields, geom):
+        super().add_feature(fields, geom)
         feature = self.new_feature()
         points = [QgsPointXY(c.x, c.y) for c in geom]
         for name, value in fields.items():

@@ -67,6 +67,13 @@ class MapView:
             callback=self.move_action,
             enabled_flag=False)
 
+        self.plugin.add_action(
+            self.plugin.get_resource('grid'),
+            text=self.plugin.tr(u'Show Grid'),
+            callback=self.grid_action,
+            enabled_flag=False,
+            checked=True)
+
     def rpn_action(self):
         self.plugin.show_help()
 
@@ -108,6 +115,9 @@ class MapView:
             if self.current is not None:
                 self.current.layer().commitChanges()
             self.controller.save_map(filepath)
+
+    def grid_action(self):
+        self.plugin.show_minimap()
 
     def add_building_action(self):
         self.set_active_layer('Buildings')
