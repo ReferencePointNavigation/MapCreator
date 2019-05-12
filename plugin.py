@@ -15,7 +15,11 @@ import os
 
 from .referencepoint.map_builder import MapBuilder
 from .referencepoint.map_view import MapView
-from ui import LayerFactory, QgsMap, MiniMap
+from ui import LayerFactory, QgsMap, MiniMap, Toolbar
+
+import importlib
+importlib.import_module('ui')
+
 
 from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from PyQt5.QtGui import QIcon
@@ -64,6 +68,7 @@ class Plugin:
         self.view = MapView(self, QgsProject.instance())
         self.controller = MapBuilder(self.view, self.map)
         self.minimap = None
+        self.tb = Toolbar(self.iface, "Test")
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -170,6 +175,7 @@ class Plugin:
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
         self.view.show()
+
 
     def show_minimap(self):
         layer = self.iface.mapCanvas().currentLayer()

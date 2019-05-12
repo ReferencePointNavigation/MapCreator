@@ -1,5 +1,4 @@
 from PyQt5.QtGui import QPainter, QPen, QColor
-from PyQt5.QtCore import pyqtSlot
 from qgis.gui import QgsMapCanvasItem
 from qgis.core import QgsProject, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsPointXY, qgsDoubleNear, QgsMessageLog
 from math import ceil
@@ -14,7 +13,7 @@ class MiniMap(QgsMapCanvasItem):
         self.map = mmap
         self.tile_size = tile_size
         self.level = 0
-        self.grid_pen = QPen(QColor(0, 0, 255, 120))
+        self.grid_pen = QPen(QColor(127, 127, 127, 120))
         self.transformer = QgsCoordinateTransform(
             self.canvas.mapSettings().destinationCrs(),
             QgsCoordinateReferenceSystem(self.map.get_crs()),

@@ -1,9 +1,5 @@
-from PyQt5.QtGui import QPainter, QPen, QColor
-from PyQt5.QtCore import pyqtSlot
-from qgis.gui import QgsMapCanvasItem
-from qgis.core import QgsCsException, QgsCoordinateTransform, QgsPointXY, qgsDoubleNear, QgsMessageLog
-from math import ceil
-from PyQt5.QtWidgets import QAction
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QInputDialog, QLineEdit, QFileDialog, QAction, QDialog
 
 
 class QgsWidget(QAction):
@@ -12,12 +8,11 @@ class QgsWidget(QAction):
 
     registry = {}
 
-    def __init_subclass__(cls, **kwargs):
-        super().__init_subclass__(**kwargs)
-        QgsWidget.registry[cls.__name__] = cls()
-
-    def __init__(self, iface):
-        QAction.__init__(self, iface.mainWindow())
+    def __init__(self, iface, icon, text):
+        QAction.__init__(self,
+                         QIcon(self.get_resource(icon)),
+                         self.translate(text),
+                         iface.mainWindow())
         self.iface = iface
         self.triggered.connect(self.action)
 
@@ -29,6 +24,26 @@ class QgsWidget(QAction):
 
     def action(self):
         pass
+
+
+class FileManagerMixin:
+
+    def show_open_dialog(self, title):
+        qfd = QFileDialog()
+        f = QFileDialog.getOpenFileName(qfd, title, '~')
+        return f[0]
+
+    def show_input_dialog(self, iface, title, prompt):
+        text, _ = QInputDialog.getText(iface.mainWindow(), title, prompt, QLineEdit.Normal, '')
+        return text
+
+    def show_save_folder_dialog(self, title):
+        qfd = QFileDialog()
+        qfd.setFileMode(QFileDialog.DirectoryOnly)
+        if qfd.exec_() == QDialog.Accepted:
+            return qfd.selectedFiles()[0]
+        else:
+            return None
 
 
 class WidgetFactory:

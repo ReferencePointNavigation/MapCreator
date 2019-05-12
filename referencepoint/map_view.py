@@ -1,4 +1,5 @@
 import os
+from pubsub import pub
 
 class MapView:
 
@@ -74,6 +75,11 @@ class MapView:
             enabled_flag=False,
             checked=True)
 
+        pub.subscribe(self.new_map, 'new-map')
+        pub.subscribe(self.import_map, 'import-map')
+        pub.subscribe(self.export_map, 'export-map')
+        pub.subscribe(self.tool_selected, 'tool-selected')
+
     def rpn_action(self):
         self.plugin.show_help()
 
@@ -84,21 +90,32 @@ class MapView:
         if mapname is not '':
             self.new_map(mapname)
 
-    def new_map(self, mapname):
+    def new_map(self, arg1):
         self.project.clear()
         self.plugin.show_basemap()
         self.current = None
         self.layers = dict()
-        self.group = self.project.layerTreeRoot().insertGroup(0, mapname)
-        self.controller.new_map(mapname)
+        self.group = self.project.layerTreeRoot().insertGroup(0, arg1)
+        self.controller.new_map(arg1)
         for action in self.plugin.actions:
             action.setEnabled(True)
+
+    def import_map(self, arg1):
+        mapname, _ = os.path.splitext(os.path.basename(arg1))
+        self.new_map(mapname)
+        self.controller.import_map(arg1)
+
+    def export_map(self, arg1):
+        if self.current is not None:
+            self.current.layer().commitChanges()
+        self.controller.save_map(arg1)
 
     def add_layers(self, layers):
         if self.group is not None:
             for layer in layers:
                 self.layers[layer.name] = layer.add_to_group(self.group)
                 self.layers[layer.name].setCustomProperty("showFeatureCount", True)
+
 
     def open_action(self):
         title = self.plugin.tr(u'Open File')
@@ -118,6 +135,9 @@ class MapView:
 
     def grid_action(self):
         self.plugin.show_minimap()
+
+    def tool_selected(self, arg1):
+        self.set_active_layer(arg1)
 
     def add_building_action(self):
         self.set_active_layer('Buildings')
