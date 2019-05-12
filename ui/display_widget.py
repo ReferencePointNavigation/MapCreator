@@ -1,4 +1,6 @@
+from PyQt5.QtWidgets import QAction, QActionGroup, QToolButton, QMenu
 from .qgs_widget import QgsWidget
+from referencepoint import Topics
 
 
 class DisplayWidget(QgsWidget):
@@ -12,7 +14,10 @@ class DisplayWidget(QgsWidget):
     def __init__(self, iface, icon, text):
         super().__init__(iface, icon, text)
         self.setEnabled(False)
+        self.subscribe(self.map_created, Topics.MAP_CREATED)
 
+    def map_created(self, arg1):
+        self.setEnabled(True)
 
 class ShowGridWidget(DisplayWidget):
 
@@ -27,6 +32,9 @@ class ShowLevelMenu(DisplayWidget):
 
     def __init__(self, iface):
         super().__init__(iface, 'floors', u'Show Floors')
+        self.level_menu = QMenu()
+        self.setMenu(self.level_menu)
+
 
     def action(self):
         pass

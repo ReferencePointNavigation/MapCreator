@@ -1,7 +1,7 @@
-import os
 from .qgs_widget import QgsWidget, FileManagerMixin
 from qgis.utils import showPluginHelp
-from pubsub import pub
+from referencepoint import Topics
+
 
 class ProjectWidget(QgsWidget, FileManagerMixin):
 
@@ -38,7 +38,7 @@ class NewMapWidget(ProjectWidget):
             self.new_map(mapname)
 
     def new_map(self, mapname):
-        pub.sendMessage('new-map', arg1=mapname)
+        self.publish(Topics.NEW_MAP, mapname)
 
 
 class ImportMapWidget(ProjectWidget):
@@ -50,7 +50,7 @@ class ImportMapWidget(ProjectWidget):
         title = self.translate(u'Open File')
         f = self.show_open_dialog(title)
         if len(f) > 2:
-            pub.sendMessage('import-map', arg1=f)
+            self.publish(Topics.IMPORT_MAP, f)
 
 
 class ExportMapWidget(ProjectWidget):
@@ -62,5 +62,5 @@ class ExportMapWidget(ProjectWidget):
         title = self.translate(u'Select Directory')
         filepath = self.show_save_folder_dialog(title)
         if filepath is not None:
-            pub.sendMessage('export-map', arg1=filepath)
+            self.publish(Topics.EXPORT_MAP, filepath)
 

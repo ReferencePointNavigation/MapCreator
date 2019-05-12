@@ -1,5 +1,6 @@
 import os
 from pubsub import pub
+from referencepoint import Topics
 
 class MapView:
 
@@ -16,79 +17,10 @@ class MapView:
         self.controller = controller
 
     def show(self):
-        self.plugin.add_action(
-            self.plugin.get_resource('logo'),
-            text=self.plugin.tr(u'About Reference Point Navigation'),
-            callback=self.rpn_action)
-
-        self.plugin.add_action(
-            self.plugin.get_resource('new'),
-            text=self.plugin.tr(u'New Reference Point Map'),
-            callback=self.new_map_action)
-
-        self.plugin.add_action(
-            self.plugin.get_resource('import'),
-            text=self.plugin.tr(u'Import Reference Point Map'),
-            callback=self.open_action)
-
-        self.plugin.add_action(
-            self.plugin.get_resource('export'),
-            text=self.plugin.tr(u'Export Reference Point Map'),
-            callback=self.save_action)
-
-        self.plugin.add_separator()
-
-        self.plugin.add_action(
-            self.plugin.get_resource('building'),
-            text=self.plugin.tr(u'Add Building'),
-            callback=self.add_building_action,
-            enabled_flag=False)
-
-        self.plugin.add_action(
-            self.plugin.get_resource('floor'),
-            text=self.plugin.tr(u'Add Floor'),
-            callback=self.add_floor_action,
-            enabled_flag=False)
-
-        self.plugin.add_action(
-            self.plugin.get_resource('landmark'),
-            text=self.plugin.tr(u'Add Landmark'),
-            callback=self.add_landmark_action,
-            enabled_flag=False)
-
-        self.plugin.add_action(
-            self.plugin.get_resource('path'),
-            text=self.plugin.tr(u'Add Path'),
-            callback=self.add_path_action,
-            enabled_flag=False)
-
-        self.plugin.add_action(
-            self.plugin.get_resource('move'),
-            text=self.plugin.tr(u'Move Object'),
-            callback=self.move_action,
-            enabled_flag=False)
-
-        self.plugin.add_action(
-            self.plugin.get_resource('grid'),
-            text=self.plugin.tr(u'Show Grid'),
-            callback=self.grid_action,
-            enabled_flag=False,
-            checked=True)
-
-        pub.subscribe(self.new_map, 'new-map')
-        pub.subscribe(self.import_map, 'import-map')
-        pub.subscribe(self.export_map, 'export-map')
-        pub.subscribe(self.tool_selected, 'tool-selected')
-
-    def rpn_action(self):
-        self.plugin.show_help()
-
-    def new_map_action(self):
-        title = self.plugin.tr(u'Enter a name for the new Map')
-        prompt = self.plugin.tr(u'Name:')
-        mapname = self.plugin.show_input_dialog(title, prompt)
-        if mapname is not '':
-            self.new_map(mapname)
+        pub.subscribe(self.new_map, Topics.NEW_MAP.value)
+        pub.subscribe(self.import_map, Topics.IMPORT_MAP.value)
+        pub.subscribe(self.export_map, Topics.EXPORT_MAP.value)
+        pub.subscribe(self.tool_selected, Topics.TOOL_SELECTED.value)
 
     def new_map(self, arg1):
         self.project.clear()
@@ -99,6 +31,7 @@ class MapView:
         self.controller.new_map(arg1)
         for action in self.plugin.actions:
             action.setEnabled(True)
+        pub.sendMessage(Topics.MAP_CREATED.value, arg1=arg1)
 
     def import_map(self, arg1):
         mapname, _ = os.path.splitext(os.path.basename(arg1))
@@ -116,40 +49,15 @@ class MapView:
                 self.layers[layer.name] = layer.add_to_group(self.group)
                 self.layers[layer.name].setCustomProperty("showFeatureCount", True)
 
-
-    def open_action(self):
-        title = self.plugin.tr(u'Open File')
-        f = self.plugin.show_open_dialog(title)
-        if len(f) > 2:
-            mapname, _ = os.path.splitext(os.path.basename(f))
-            self.new_map(mapname)
-            self.controller.import_map(f)
-
-    def save_action(self):
-        title = self.plugin.tr(u'Select Directory')
-        filepath = self.plugin.show_save_folder_dialog(title)
-        if filepath is not None:
-            if self.current is not None:
-                self.current.layer().commitChanges()
-            self.controller.save_map(filepath)
+    def tool_selected(self, arg1):
+        self.set_active_layer(arg1)
 
     def grid_action(self):
         self.plugin.show_minimap()
 
-    def tool_selected(self, arg1):
-        self.set_active_layer(arg1)
-
-    def add_building_action(self):
-        self.set_active_layer('Buildings')
-
-    def add_floor_action(self):
-        self.set_active_layer('Rooms')
-
-    def add_landmark_action(self):
-        self.set_active_layer('Landmarks')
-
-    def add_path_action(self):
-        self.set_active_layer('Paths')
+    def move_action(self):
+        if self.current is not None:
+            self.plugin.select_move_tool()
 
     def set_active_layer(self, layer):
         if self.current is not None:
@@ -159,11 +67,11 @@ class MapView:
         self.current.layer().startEditing()
         self.plugin.set_add_feature()
 
-    def move_action(self):
-        if self.current is not None:
-            self.plugin.select_move_tool()
 
     def add_layer(self, name, path):
         layer = self.plugin.new_layer(path, self.plugin.tr(name))
         self.group.addLayer(layer)
         return layer
+
+    def unload(self):
+        pass

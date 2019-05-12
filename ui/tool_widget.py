@@ -1,5 +1,5 @@
 from .qgs_widget import QgsWidget
-from pubsub import pub
+from referencepoint import Topics
 
 
 class ToolWidget(QgsWidget):
@@ -12,11 +12,15 @@ class ToolWidget(QgsWidget):
 
     def __init__(self, iface, icon, text, layer_name):
         super().__init__(iface, icon, text)
-        self.setEnabled(True)
+        self.setEnabled(False)
         self.layer_name = layer_name
+        self.subscribe(self.map_created, Topics.MAP_CREATED)
+
+    def map_created(self, arg1):
+        self.setEnabled(True)
 
     def action(self):
-        pub.sendMessage('tool-selected', arg1=self.layer_name)
+        self.publish(Topics.TOOL_SELECTED, self.layer_name)
 
 
 class AddBuildingWidget(ToolWidget):

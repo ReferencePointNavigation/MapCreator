@@ -14,8 +14,8 @@ class Toolbar:
         for group, class_list in QgsWidget.registry.items():
             for cls in class_list:
                 self.add_action(cls(self.iface))
+            # TODO don't add a separator at the end of the last group
             self.add_separator()
-
 
     def add_action(self, action):
         self.actions.append(action)
@@ -23,3 +23,9 @@ class Toolbar:
 
     def add_separator(self):
         self.toolbar.addSeparator()
+
+    def unload(self):
+        for action in self.actions:
+            self.iface.removeToolBarIcon(action)
+        # remove the toolbar
+        del self.toolbar

@@ -1,5 +1,6 @@
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QInputDialog, QLineEdit, QFileDialog, QAction, QDialog
+from pubsub import pub
 
 
 class QgsWidget(QAction):
@@ -16,9 +17,18 @@ class QgsWidget(QAction):
         self.iface = iface
         self.triggered.connect(self.action)
 
+    # noinspection PyMethodMayBeStatic
+    def publish(self, topic, arg1):
+        pub.sendMessage(topic.value, arg1=arg1)
+
+    # noinspection PyMethodMayBeStatic
+    def subscribe(self, listener, topic):
+        pub.subscribe(listener, topic.value)
+
     def get_resource(self, name):
         return self.RESOURCE_PATH + name + '.svg'
 
+    # noinspection PyMethodMayBeStatic
     def translate(self, text):
         return text
 

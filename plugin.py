@@ -7,7 +7,7 @@
                               -------------------
         begin                : 2018-10-19
         git sha              : $Format:%H$
-        copyright            : (C) 2018 by Chris Daley
+        copyright            : (C) 2019 by Chris Daley
         email                : chebizarro@gmail.com
  ***************************************************************************/
 """
@@ -60,15 +60,11 @@ class Plugin:
         # Declare instance attributes
         self.actions = []
         self.menu = self.tr(u'&Reference Point Map Builder')
-        self.toolbar = self.iface.addToolBar(u'Map Builder')
-        self.toolbar.setObjectName(u'MapBuilder')
-        self.resource_path = ':/plugins/map_builder/resources/'
-
+        self.toolbar = Toolbar(iface, u'Map Builder')
         self.map = QgsMap(self.tr(u'Untitled'), LayerFactory())
         self.view = MapView(self, QgsProject.instance())
         self.controller = MapBuilder(self.view, self.map)
         self.minimap = None
-        self.tb = Toolbar(self.iface, "Test")
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -84,9 +80,6 @@ class Plugin:
         """
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
         return QCoreApplication.translate('MapBuilder', message)
-
-    def get_resource(self, name):
-        return self.resource_path + name + '.svg'
 
     def add_action(
         self,
@@ -158,7 +151,7 @@ class Plugin:
             action.setWhatsThis(whats_this)
 
         if add_to_toolbar:
-            self.toolbar.addAction(action)
+            self.toolbar.add_action(action)
 
         if add_to_menu:
             self.iface.addPluginToMenu(
@@ -169,13 +162,9 @@ class Plugin:
 
         return action
 
-    def add_separator(self):
-        self.toolbar.addSeparator()
-
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
         self.view.show()
-
 
     def show_minimap(self):
         layer = self.iface.mapCanvas().currentLayer()
@@ -186,23 +175,6 @@ class Plugin:
         # self.minimap.setCrs(layer.crs())
         # self.minimap.setPrecision(layer.geometryOptions().geometryPrecision())
         # self.minimap.setEnabled(True)
-
-    def show_open_dialog(self, title):
-        qfd = QFileDialog()
-        f = QFileDialog.getOpenFileName(qfd, title, '~')
-        return f[0]
-
-    def show_save_folder_dialog(self, title):
-        qfd = QFileDialog()
-        qfd.setFileMode(QFileDialog.DirectoryOnly)
-        if qfd.exec_() == QDialog.Accepted:
-            return qfd.selectedFiles()[0]
-        else:
-            return None
-
-    def show_input_dialog(self, title, prompt):
-        text, _ = QInputDialog.getText(self.iface.mainWindow(), title, prompt, QLineEdit.Normal, '')
-        return text
 
     def show_help(self):
         showPluginHelp()
@@ -236,6 +208,6 @@ class Plugin:
                 action)
             self.iface.removeToolBarIcon(action)
         # remove the toolbar
-        del self.toolbar
+        self.toolbar.unload()
 
 
