@@ -75,7 +75,10 @@ class MapExporter:
         for floor in building.get_floors():
             flr = bldg.floors.add()
             flr.number = floor.get_number()
-            for room in floor.get_rooms():
+            rooms = floor.get_rooms()
+            if len(rooms) == 0:
+                continue
+            for room in rooms:
                 rm = flr.navigableSpaces.add()
                 for points in room.get_geometry():
                     pts = rm.outerBoundary.add()
@@ -123,6 +126,7 @@ class MapExporter:
     def __generate_minimap(floor, floor_proto, tile_size):
 
         bbox = floor.get_bounding_box()
+
         minX = bbox.xMinimum()
         minY = bbox.yMinimum()
         maxX = bbox.xMaximum()

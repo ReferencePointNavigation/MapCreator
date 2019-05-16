@@ -17,10 +17,11 @@ class MapView:
         self.controller = controller
 
     def show(self):
-        pub.subscribe(self.new_map, Topics.NEW_MAP.value)
-        pub.subscribe(self.import_map, Topics.IMPORT_MAP.value)
-        pub.subscribe(self.export_map, Topics.EXPORT_MAP.value)
-        pub.subscribe(self.tool_selected, Topics.TOOL_SELECTED.value)
+
+        self.subscribe(self.new_map, Topics.NEW_MAP)
+        self.subscribe(self.import_map, Topics.IMPORT_MAP)
+        self.subscribe(self.export_map, Topics.EXPORT_MAP)
+        self.subscribe(self.tool_selected, Topics.TOOL_SELECTED)
 
     def new_map(self, arg1):
         self.project.clear()
@@ -29,9 +30,7 @@ class MapView:
         self.layers = dict()
         self.group = self.project.layerTreeRoot().insertGroup(0, arg1)
         self.controller.new_map(arg1)
-        for action in self.plugin.actions:
-            action.setEnabled(True)
-        pub.sendMessage(Topics.MAP_CREATED.value, arg1=arg1)
+        self.publish(Topics.MAP_CREATED, arg1)
 
     def import_map(self, arg1):
         mapname, _ = os.path.splitext(os.path.basename(arg1))
@@ -67,11 +66,15 @@ class MapView:
         self.current.layer().startEditing()
         self.plugin.set_add_feature()
 
-
     def add_layer(self, name, path):
         layer = self.plugin.new_layer(path, self.plugin.tr(name))
         self.group.addLayer(layer)
         return layer
 
-    def unload(self):
-        pass
+    # noinspection PyMethodMayBeStatic
+    def publish(self, topic, arg1):
+        pub.sendMessage(topic.value, arg1=arg1)
+
+    # noinspection PyMethodMayBeStatic
+    def subscribe(self, listener, topic):
+        pub.subscribe(listener, topic.value)

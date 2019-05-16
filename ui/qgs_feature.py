@@ -56,7 +56,6 @@ class Floor:
         self.__geom = None
         self.__layer = layer
 
-
     def get_number(self):
         return self.__number
 

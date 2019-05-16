@@ -10,6 +10,10 @@ from qgis.core import (
     QgsRectangle
 )
 
+from pubsub import pub
+from referencepoint import Topics
+
+
 class Layer(object):
 
     def __init__(self, name, geom_type, crs):
@@ -38,10 +42,15 @@ class Layer(object):
         self.layer.startEditing()
 
     def get_features(self, query=None, bbox=None):
-        self.filter.setFilterRect(QgsRectangle())
+
+        old_substring = self.layer.subsetString()
+        self.layer.setSubsetString(None)
+        self.layer.updateExtents(True)
 
         if bbox is not None:
             self.filter.setFilterRect(bbox)
+        else:
+            self.filter.setFilterRect(QgsRectangle())
 
         if query is not None and self.query is not None:
             self.filter.setFilterExpression('{0} and {1}'.format(self.query, query))
@@ -50,7 +59,12 @@ class Layer(object):
         elif self.query is not None:
             self.filter.setFilterExpression(self.query)
 
-        return self.layer.getFeatures(self.filter)
+        features = self.layer.getFeatures(self.filter)
+
+        self.layer.setSubsetString(old_substring)
+        self.layer.updateExtents(True)
+
+        return features
 
     def add_feature(self, fields, geom):
         self.layer.setDefaultValueDefinition(0, QgsDefaultValue('\'New {0} {1}\''.format(self.name[:-1], self.new_count)))
@@ -65,8 +79,18 @@ class Layer(object):
         self.crs = crs
         self.layer.setCrs(QgsCoordinateReferenceSystem(crs))
 
+    # noinspection PyMethodMayBeStatic
+    def publish(self, topic, arg1):
+        pub.sendMessage(topic.value, arg1=arg1)
+
+    # noinspection PyMethodMayBeStatic
+    def subscribe(self, listener, topic):
+        pub.subscribe(listener, topic.value)
+
+
 class LayerFactory:
 
+    # noinspection PyMethodMayBeStatic
     def new_layers(self, crs='3857'):
 
         return {
@@ -138,6 +162,7 @@ class PathLayer(Layer):
 class RoomLayer(Layer):
     def __init__(self, crs):
         super().__init__(u'Rooms', 'Polygon', crs)
+        self.subscribe(self.on_level_selected, Topics.LEVEL_SELECTED)
 
     def add_feature(self, fields, geom):
         super().add_feature(fields, geom)
@@ -147,6 +172,23 @@ class RoomLayer(Layer):
             feature[name] = value
         feature.setGeometry(QgsGeometry.fromPolygonXY([points]))
         self.layer.dataProvider().addFeatures([feature])
+        self.publish(Topics.NEW_ROOM, int(fields['level']))
         return feature
 
+    def on_level_selected(self, arg1):
+        self.layer.setSubsetString(None)
+        if arg1 is not None:
+            self.layer.setSubsetString('"level"=\'{}\''.format(arg1))
+        self.layer.updateExtents(True)
 
+    def get_levels(self, building):
+        features = self.layer.getFeatures(building)
+        levels = set()
+        for level in features:
+            attr = level.attributes()[1]
+            if attr is None:
+                continue
+            else:
+                levels.add(int(attr))
+
+        return levels

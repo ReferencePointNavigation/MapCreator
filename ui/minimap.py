@@ -2,14 +2,15 @@ from PyQt5.QtGui import QPainter, QPen, QColor
 from qgis.gui import QgsMapCanvasItem
 from qgis.core import QgsProject, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsPointXY, qgsDoubleNear, QgsMessageLog
 from math import ceil
-
+from pubsub import pub
+from referencepoint.topics import Topics
 
 class MiniMap(QgsMapCanvasItem):
 
     def __init__(self, canvas, mmap, tile_size):
         self.canvas = canvas
         QgsMapCanvasItem.__init__(self, canvas)
-        self.enabled = True
+        self.enabled = False
         self.map = mmap
         self.tile_size = tile_size
         self.level = 0
@@ -18,9 +19,19 @@ class MiniMap(QgsMapCanvasItem):
             self.canvas.mapSettings().destinationCrs(),
             QgsCoordinateReferenceSystem(self.map.get_crs()),
             QgsProject.instance())
+        pub.subscribe(self.on_show_minimap, Topics.SHOW_MINIMAP.value)
+        pub.subscribe(self.on_level_selected, Topics.LEVEL_SELECTED.value)
+
+    def on_level_selected(self, arg1):
+        if arg1 is not None:
+            self.set_level(int(arg1))
+
+    def on_show_minimap(self, arg1):
+        self.set_enabled(arg1)
 
     def set_enabled(self, enabled):
         self.enabled = enabled
+        self.canvas.refresh()
 
     def set_level(self, level):
         self.level = level

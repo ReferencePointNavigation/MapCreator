@@ -18,20 +18,22 @@ class QgsMap:
 
     def get_buildings(self, bbox=None):
         layer = self.layers['buildings']
+        floors_layer = self.layers['rooms']
+        lm_layer = self.layers['landmarks']
+
         buildings = [Building(b, layer.fields) for b in layer.get_features(bbox=bbox)]
+
         for building in buildings:
-            floors_layer = self.layers['rooms']
-            bbox = building.get_bounding_box()
-            floor_nos = sorted(set([int(f['level']) for f in floors_layer.get_features(bbox=bbox)]))
+            box = building.get_bounding_box()
+            floor_nos = floors_layer.get_levels(box)
             floors = [Floor(f, floors_layer) for f in floor_nos]
             building.add_floors(floors)
             for floor in floors:
                 query = '"level" = \'{}\''.format(floor.get_number())
-                rooms = [Room(r, floors_layer.fields) for r in floors_layer.get_features(query=query, bbox=bbox)]
+                rooms = [Room(r, floors_layer.fields) for r in floors_layer.get_features(query=query, bbox=box)]
                 floor.add_rooms(rooms)
-                lm_layer = self.layers['landmarks']
                 query += ' and "indoor" = \'yes\''
-                landmarks = [Landmark(l, lm_layer.fields) for l in lm_layer.get_features(query=query, bbox=bbox)]
+                landmarks = [Landmark(l, lm_layer.fields) for l in lm_layer.get_features(query=query, bbox=box)]
                 floor.add_landmarks(landmarks)
 
         return buildings

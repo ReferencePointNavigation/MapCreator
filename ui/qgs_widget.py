@@ -38,15 +38,18 @@ class QgsWidget(QAction):
 
 class FileManagerMixin:
 
+    # noinspection PyMethodMayBeStatic
     def show_open_dialog(self, title):
         qfd = QFileDialog()
         f = QFileDialog.getOpenFileName(qfd, title, '~')
         return f[0]
 
+    # noinspection PyMethodMayBeStatic
     def show_input_dialog(self, iface, title, prompt):
         text, _ = QInputDialog.getText(iface.mainWindow(), title, prompt, QLineEdit.Normal, '')
         return text
 
+    # noinspection PyMethodMayBeStatic
     def show_save_folder_dialog(self, title):
         qfd = QFileDialog()
         qfd.setFileMode(QFileDialog.DirectoryOnly)
@@ -54,16 +57,4 @@ class FileManagerMixin:
             return qfd.selectedFiles()[0]
         else:
             return None
-
-
-class WidgetFactory:
-
-    def __init__(self, iface):
-         self.iface = iface
-
-    def get_widget(self, name):
-        pass
-
-    def get_widgets(self):
-        return QgsWidget.registry
 

@@ -64,7 +64,7 @@ class Plugin:
         self.map = QgsMap(self.tr(u'Untitled'), LayerFactory())
         self.view = MapView(self, QgsProject.instance())
         self.controller = MapBuilder(self.view, self.map)
-        self.minimap = None
+        self.minimap = MiniMap(self.iface.mapCanvas(), self.map, 1.0)
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -165,16 +165,6 @@ class Plugin:
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
         self.view.show()
-
-    def show_minimap(self):
-        layer = self.iface.mapCanvas().currentLayer()
-        self.minimap = MiniMap(self.iface.mapCanvas(), self.map, 1.0)
-        self.minimap.set_enabled(True)
-        self.minimap.canvas.refresh()
-        # self.minimap.setVisible(True)
-        # self.minimap.setCrs(layer.crs())
-        # self.minimap.setPrecision(layer.geometryOptions().geometryPrecision())
-        # self.minimap.setEnabled(True)
 
     def show_help(self):
         showPluginHelp()
