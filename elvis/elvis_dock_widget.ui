@@ -1,49 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Frame</class>
- <widget class="QFrame" name="Frame">
+ <class>DockWidget</class>
+ <widget class="QDockWidget" name="DockWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>272</width>
-    <height>238</height>
+    <width>240</width>
+    <height>305</height>
    </rect>
   </property>
+  <property name="maximumSize">
+   <size>
+    <width>240</width>
+    <height>400</height>
+   </size>
+  </property>
   <property name="windowTitle">
-   <string>Frame</string>
+   <string>ELVIS</string>
   </property>
-  <property name="frameShape">
-   <enum>QFrame::StyledPanel</enum>
-  </property>
-  <property name="frameShadow">
-   <enum>QFrame::Raised</enum>
-  </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
-    <widget class="QComboBox" name="building_select"/>
-   </item>
-   <item>
-    <widget class="QComboBox" name="landmark_from_select"/>
-   </item>
-   <item>
-    <widget class="QComboBox" name="landmark_to_select"/>
-   </item>
-   <item>
-    <widget class="QPushButton" name="pushButton">
-     <property name="text">
-      <string>Reset</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QPushButton" name="run_simulation_button">
-     <property name="text">
-      <string>Run Simulation</string>
-     </property>
-    </widget>
-   </item>
-  </layout>
+  <widget class="QWidget" name="dockWidgetContents">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QGroupBox" name="groupBox">
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>100</height>
+       </size>
+      </property>
+      <property name="title">
+       <string>Select algorithm</string>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QComboBox" name="algorithm_select"/>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="simulation_group">
+      <property name="title">
+       <string>Simulation</string>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QComboBox" name="building_select"/>
+       </item>
+       <item>
+        <widget class="QComboBox" name="landmark_from_select"/>
+       </item>
+       <item>
+        <widget class="QComboBox" name="landmark_to_select"/>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton">
+         <property name="text">
+          <string>Reset</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="run_simulation_button">
+         <property name="text">
+          <string>Run Simulation</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+   </layout>
+  </widget>
  </widget>
  <resources/>
  <connections/>

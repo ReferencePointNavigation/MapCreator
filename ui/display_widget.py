@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QAction, QActionGroup, QToolButton, QMenu
+from PyQt5.QtWidgets import QAction, QActionGroup, QMenu
 from .qgs_widget import QgsWidget
 from referencepoint import Topics
 
@@ -30,10 +30,6 @@ class ShowGridWidget(DisplayWidget):
     def on_toggled(self, checked):
         self.publish(Topics.SHOW_MINIMAP, checked)
 
-    def action(self):
-        pass
-        #self.setChecked(not self.isChecked())
-
 
 class ShowLevelMenu(DisplayWidget):
 
@@ -42,7 +38,8 @@ class ShowLevelMenu(DisplayWidget):
         self.setCheckable(False)
         self.level_menu = QMenu()
         self.setMenu(self.level_menu)
-        self.subscribe(self.levels_change, Topics.NEW_ROOM)
+        self.subscribe(self.levels_change, Topics.LEVELS_CHANGE)
+        self.subscribe(self.new_room, Topics.NEW_ROOM)
         self.levels = set()
         self.group = QActionGroup(self.iface.mainWindow())
         self.add_action(self.translate('Show all'), None)
@@ -51,6 +48,10 @@ class ShowLevelMenu(DisplayWidget):
         pass
 
     def levels_change(self, arg1):
+        for room in arg1:
+            self.new_room(room)
+
+    def new_room(self, arg1):
         if arg1 in self.levels:
             return
         self.levels.add(arg1)

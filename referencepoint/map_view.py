@@ -2,14 +2,15 @@ import os
 from pubsub import pub
 from referencepoint import Topics
 
+
 class MapView:
 
-    controller = None
-    group = None
-    layers = None
-    current = None
-
     def __init__(self, plugin, project):
+        self.controller = None
+        self.group = None
+        self.layers = None
+        self.current = None
+
         self.plugin = plugin
         self.project = project
 
@@ -17,7 +18,6 @@ class MapView:
         self.controller = controller
 
     def show(self):
-
         self.subscribe(self.new_map, Topics.NEW_MAP)
         self.subscribe(self.import_map, Topics.IMPORT_MAP)
         self.subscribe(self.export_map, Topics.EXPORT_MAP)

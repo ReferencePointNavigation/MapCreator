@@ -23,6 +23,7 @@ class MapBuilder:
         importer.import_map()
         self.map.set_crs(3857)
 
+
     def save_map(self, filepath):
         writer = MapWriter(self.map.get_name(), filepath)
         self.map.set_crs(4326)

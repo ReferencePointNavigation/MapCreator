@@ -4,6 +4,8 @@ from qgis.core import (
     QgsPointXY
 )
 
+from math import ceil
+
 
 class Feature(object):
 
@@ -79,6 +81,35 @@ class Floor:
 
     def get_bounding_box(self):
         return self.__geom.boundingBox()
+
+    def get_grid(self, tile_size=1.0):
+        grid = []
+        bbox = self.get_bounding_box()
+        min_x = bbox.xMinimum()
+        min_y = bbox.yMinimum()
+        max_x = bbox.xMaximum()
+        max_y = bbox.yMaximum()
+        rows = max(ceil((max_y - min_y) / tile_size), 0)
+        columns = max(ceil((max_x - min_x) / tile_size), 0)
+        curr_y = min_y
+        curr_x = min_x
+
+        for i in range(0, rows):
+            for column in range(0, columns):
+                tile = [
+                    (curr_x, curr_y),
+                    (curr_x + tile_size, curr_y),
+                    (curr_x + tile_size, curr_y + tile_size),
+                    (curr_x, curr_y + tile_size)
+                ]
+                if self.intersects(tile):
+                    grid.append(tile)
+
+                curr_x += tile_size
+            curr_x = min_x
+            curr_y += tile_size
+
+        return grid
 
     def intersects(self, geom):
         points = QgsGeometry.fromPolylineXY(

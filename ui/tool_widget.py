@@ -52,6 +52,3 @@ class MoveWidget(ToolWidget):
     def __init__(self, iface):
         super().__init__(iface, 'move', u'Move an Object', '')
 
-    def action(self):
-        pass
-

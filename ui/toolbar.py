@@ -3,19 +3,19 @@ from ui.qgs_widget import QgsWidget
 
 class Toolbar:
 
-    registry = {}
-
     def __init__(self, iface, name):
         self.iface = iface
         self.toolbar = self.iface.addToolBar(name)
         self.toolbar.setObjectName(name)
         self.actions = []
 
+        grp = 0
         for group, class_list in QgsWidget.registry.items():
+            grp += 1
             for cls in class_list:
                 self.add_action(cls(self.iface))
-            # TODO don't add a separator at the end of the last group
-            self.add_separator()
+            if grp < len(QgsWidget.registry):
+                self.add_separator()
 
     def add_action(self, action):
         self.actions.append(action)

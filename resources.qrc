@@ -2,6 +2,7 @@
     <qresource prefix="/plugins/map_builder" >
         <file>icon.png</file>
         <file>resources/building.svg</file>
+        <file>resources/elvis.svg</file>
         <file>resources/export.svg</file>
         <file>resources/import.svg</file>
         <file>resources/floors.svg</file>

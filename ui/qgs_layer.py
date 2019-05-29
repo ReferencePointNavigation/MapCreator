@@ -34,6 +34,11 @@ class Layer(object):
         path = '{0}?crs=epsg:{1}&field={2}'.format(geom_type, self.crs, '&field='.join(self.fields))
         self.layer = QgsVectorLayer(path, name, 'memory')
         self.layer.setDefaultValueDefinition(1, QgsDefaultValue('0'))
+        self.layer.committedFeaturesAdded.connect(self.on_feature_added)
+
+    # overriden by subclasses
+    def on_feature_added(self):
+        pass
 
     def add_to_group(self, group):
         return group.addLayer(self.layer)
@@ -58,6 +63,8 @@ class Layer(object):
             self.filter.setFilterExpression(query)
         elif self.query is not None:
             self.filter.setFilterExpression(self.query)
+        else:
+            self.filter.setFilterExpression('')
 
         features = self.layer.getFeatures(self.filter)
 
@@ -125,6 +132,8 @@ class LandmarkLayer(Layer):
         self.fields = ['indoor:string(25)', 'type:integer']
         super().__init__(u'Landmarks', 'Point', crs)
 
+        self.subscribe(self.on_level_selected, Topics.LEVEL_SELECTED)
+
         self.layer.setEditorWidgetSetup(2,
             QgsEditorWidgetSetup("ValueMap",
                 {'map': [
@@ -153,6 +162,12 @@ class LandmarkLayer(Layer):
         self.layer.dataProvider().addFeatures([feature])
         return feature
 
+    def on_level_selected(self, arg1):
+        self.layer.setSubsetString(None)
+        if arg1 is not None:
+            self.layer.setSubsetString('"level"=\'{}\''.format(arg1))
+        self.layer.updateExtents(True)
+
 
 class PathLayer(Layer):
     def __init__(self, crs):
@@ -175,14 +190,18 @@ class RoomLayer(Layer):
         self.publish(Topics.NEW_ROOM, int(fields['level']))
         return feature
 
+    def on_feature_added(self):
+        self.publish(Topics.LEVELS_CHANGE, self.get_levels())
+
     def on_level_selected(self, arg1):
         self.layer.setSubsetString(None)
         if arg1 is not None:
             self.layer.setSubsetString('"level"=\'{}\''.format(arg1))
         self.layer.updateExtents(True)
 
-    def get_levels(self, building):
-        features = self.layer.getFeatures(building)
+    def get_levels(self, building=None):
+        features = self.layer.getFeatures() if building is None else self.layer.getFeatures(building)
+
         levels = set()
         for level in features:
             attr = level.attributes()[1]
@@ -190,5 +209,4 @@ class RoomLayer(Layer):
                 continue
             else:
                 levels.add(int(attr))
-
-        return levels
+        return sorted(levels)

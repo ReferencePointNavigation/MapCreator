@@ -16,9 +16,11 @@ import os
 from .referencepoint.map_builder import MapBuilder
 from .referencepoint.map_view import MapView
 from ui import LayerFactory, QgsMap, MiniMap, Toolbar
+from elvis import Elvis, ElvisToolbar
 
 import importlib
 importlib.import_module('ui')
+importlib.import_module('elvis')
 
 
 from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
@@ -65,6 +67,8 @@ class Plugin:
         self.view = MapView(self, QgsProject.instance())
         self.controller = MapBuilder(self.view, self.map)
         self.minimap = MiniMap(self.iface.mapCanvas(), self.map, 1.0)
+        self.elvis = Elvis(self.map)
+        self.elvis_toolbar = ElvisToolbar(self.iface, self.elvis)
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -199,5 +203,5 @@ class Plugin:
             self.iface.removeToolBarIcon(action)
         # remove the toolbar
         self.toolbar.unload()
-
+        self.elvis_toolbar.unload()
 
