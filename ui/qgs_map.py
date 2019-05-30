@@ -1,22 +1,38 @@
 from .qgs_feature import Building, Floor, Room, Landmark, Path
+from PyQt5.QtCore import pyqtSignal, QObject
 
 
-class QgsMap:
+class QgsMap(QObject):
 
-    def __init__(self, name, layer_factory):
+    map_created = pyqtSignal()
+
+    def __init__(self, name, layer_factory, project):
+        super().__init__()
         self.name = name
         self.layer_factory = layer_factory
+        self.project = project
         self.layers = None
         self.crs = 3857
+        self.basemap = layer_factory.get_base_map()
+        self.group = None
 
     def new_map(self, name):
+        self.project.clear()
+        self.basemap.show()
+        self.group = self.project.layerTreeRoot().insertGroup(0, name)
         self.name = name
         self.layers = self.layer_factory.new_layers()
+        for layer in self.layers:
+            layer.add_to_group(self.group)
+        self.map_created.emit()
 
     def get_name(self):
         return self.name
 
     def get_buildings(self, bbox=None):
+        if self.layers is None:
+            return []
+
         layer = self.layers['buildings']
         floors_layer = self.layers['rooms']
         lm_layer = self.layers['landmarks']

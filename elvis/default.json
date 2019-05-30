@@ -1,0 +1,9 @@
+{
+  "episode-count": 100000,
+  "save-interval": 100,
+  "map": "elvis/test/data/test.rpn",
+  "building": "New Building",
+  "floor": 0,
+  "start-landmark": "Room 203",
+  "end-landmark": "Room 207"
+}

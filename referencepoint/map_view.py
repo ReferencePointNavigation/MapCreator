@@ -5,14 +5,11 @@ from referencepoint import Topics
 
 class MapView:
 
-    def __init__(self, plugin, project):
+    def __init__(self, plugin):
         self.controller = None
-        self.group = None
         self.layers = None
         self.current = None
-
         self.plugin = plugin
-        self.project = project
 
     def set_controller(self, controller):
         self.controller = controller
@@ -24,11 +21,8 @@ class MapView:
         self.subscribe(self.tool_selected, Topics.TOOL_SELECTED)
 
     def new_map(self, arg1):
-        self.project.clear()
-        self.plugin.show_basemap()
         self.current = None
         self.layers = dict()
-        self.group = self.project.layerTreeRoot().insertGroup(0, arg1)
         self.controller.new_map(arg1)
         self.publish(Topics.MAP_CREATED, arg1)
 

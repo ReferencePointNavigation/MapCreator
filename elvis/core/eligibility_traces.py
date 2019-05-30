@@ -1,4 +1,4 @@
-from states_actions import StatesAndActions
+from .states_actions import StatesAndActions
 
 
 class EligibilityTraces:

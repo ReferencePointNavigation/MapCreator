@@ -10,6 +10,8 @@ from qgis.core import (
     QgsRectangle
 )
 
+import qgis.utils
+
 from pubsub import pub
 from referencepoint import Topics
 
@@ -106,6 +108,10 @@ class LayerFactory:
             'rooms': RoomLayer(crs),
             'buildings': BuildingLayer(crs)
         }
+
+    # noinspection PyMethodMayBeStatic
+    def get_base_map_layer(self):
+        return BaseMapLayer()
 
 
 class BuildingLayer(Layer):
@@ -210,3 +216,18 @@ class RoomLayer(Layer):
             else:
                 levels.add(int(attr))
         return sorted(levels)
+
+
+class BaseMapLayer:
+    def __init__(self):
+        self.layer_type = None
+        self.ol_plugin = None
+        try:
+            self.ol_plugin = qgis.utils.plugins['openlayers_plugin']
+            self.layer_type = self.ol_plugin._olLayerTypeRegistry.getById(4)
+        except KeyError:
+            pass
+
+    def show(self):
+        if self.ol_plugin is not None:
+            self.ol_plugin.addLayer(self.layer_type)

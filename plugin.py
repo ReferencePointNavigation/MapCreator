@@ -59,13 +59,16 @@ class Plugin:
             if qVersion() > '4.3.3':
                 QCoreApplication.installTranslator(self.translator)
 
+
         # Declare instance attributes
         self.actions = []
         self.menu = self.tr(u'&Reference Point Map Builder')
+
         self.toolbar = Toolbar(iface, u'Map Builder')
-        self.map = QgsMap(self.tr(u'Untitled'), LayerFactory())
-        self.view = MapView(self, QgsProject.instance())
+        self.map = QgsMap(self.tr(u'Untitled'), LayerFactory(), QgsProject.instance())
+        self.view = MapView(self)
         self.controller = MapBuilder(self.view, self.map)
+
         self.minimap = MiniMap(self.iface.mapCanvas(), self.map, 1.0)
         self.elvis = Elvis(self.map)
         self.elvis_toolbar = ElvisToolbar(self.iface, self.elvis)
@@ -181,15 +184,6 @@ class Plugin:
 
     def set_add_feature(self):
         self.iface.actionAddFeature().trigger()
-
-    def show_basemap(self):
-        try:
-            olplugin = qgis.utils.plugins['openlayers_plugin']
-            ol_gphyslayertype = olplugin._olLayerTypeRegistry.getById(4)
-            olplugin.addLayer(ol_gphyslayertype)
-        except KeyError:
-            pass
-
 
     def unload(self):
         """Disconnect the LayerChanged Signal"""

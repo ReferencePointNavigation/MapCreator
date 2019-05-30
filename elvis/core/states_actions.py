@@ -1,4 +1,5 @@
 import copy
+from .actions import Actions
 
 DEFAULT_VALUE = 0
 
@@ -13,8 +14,8 @@ class StatesAndActions:
 
         return DEFAULT_VALUE
 
-    def get_all_for_state(self, state, all_states):
-        return {action: self.get(state, action) for action in all_states}
+    def get_all_for_state(self, state):
+        return {action: self.get(state, action) for action in [member for name, member in Actions.__members__.items()]}
 
     def get_all(self):
         return copy.deepcopy(self.values)

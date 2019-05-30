@@ -2,6 +2,9 @@
 <ui version="4.0">
  <class>DockWidget</class>
  <widget class="QDockWidget" name="DockWidget">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -23,6 +26,9 @@
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <widget class="QGroupBox" name="groupBox">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="maximumSize">
        <size>
         <width>16777215</width>
@@ -34,28 +40,53 @@
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
-        <widget class="QComboBox" name="algorithm_select"/>
+        <widget class="QComboBox" name="algorithm_select">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
     </item>
     <item>
      <widget class="QGroupBox" name="simulation_group">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="title">
        <string>Simulation</string>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
-        <widget class="QComboBox" name="building_select"/>
+        <widget class="QComboBox" name="building_select">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="currentText">
+          <string/>
+         </property>
+        </widget>
        </item>
        <item>
-        <widget class="QComboBox" name="landmark_from_select"/>
+        <widget class="QComboBox" name="landmark_from_select">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+        </widget>
        </item>
        <item>
-        <widget class="QComboBox" name="landmark_to_select"/>
+        <widget class="QComboBox" name="landmark_to_select">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QPushButton" name="pushButton">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="text">
           <string>Reset</string>
          </property>
@@ -63,6 +94,9 @@
        </item>
        <item>
         <widget class="QPushButton" name="run_simulation_button">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="text">
           <string>Run Simulation</string>
          </property>

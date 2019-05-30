@@ -1,16 +1,17 @@
+from .q_values import QValues
+from .eligibility_traces import EligibilityTraces
 
 
 class Strategy:
 
-    def __init__(self, y, a, l, e, e_decay, actions):
+    def __init__(self, y, a, l, e, e_decay):
         self.y = y
         self.a = a
         self.l = l
         self.e = e
         self.e_decay = e_decay
-        self.actions = actions
         self.eligibility_traces = None
-        self.q_values = QValues(actions)
+        self.q_values = QValues()
         self.scores = [] # TODO
         self.episode = 0
         self.episode_reward = 0
