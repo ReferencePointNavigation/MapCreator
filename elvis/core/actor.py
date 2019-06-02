@@ -1,20 +1,17 @@
-from .position import Position
 
 
 class Actor(object):
 
-    def __init__(self):
+    def __init__(self, position, stride=1.0):
         self.terminal_state = False
-        self.position = Position(0,0)
+        self.position = position.copy()
+        self.stride = stride
 
     def set_position(self, position):
-        self.position = position
+        self.position = position.copy()
 
     def get_position(self):
         return self.position
-
-    def get_state(self):
-        pass
 
     def set_terminal_state(self, state):
         self.terminal_state = state
@@ -22,5 +19,6 @@ class Actor(object):
     def in_terminal_state(self):
         return self.terminal_state
 
-    def perform_action(self, action):
-        pass
+    def reset(self, position):
+        self.set_position(position)
+        self.terminal_state = False

@@ -1,21 +1,20 @@
-MAX_EPISODE_STEPS = 100000
+MAX_EPISODE_STEPS = 1000
 
 
 class Simulation:
 
     def __init__(self, config, actor, strategy, environment):
-        self.episode_count = config['episode-count']
-        self.save_interval = config['save-interval']
+        self.config = config
         self.actor = actor
         self.strategy = strategy
         self.environment = environment
 
     def run(self):
-        for episode_index in range(self.episode_count):
-            self.run_episode()
-            if episode_index > 0 and episode_index % self.save_interval == 0:
+        for episode_index in range(self.config['episode-count']):
+            steps, reward = self.run_episode()
+            if episode_index > 0 and episode_index % self.config['save-interval'] == 0:
                 self.save_to_file(self.strategy)
-                print(episode_index)
+                #print('{0}:{1} = {2}'.format(episode_index, steps, reward))
 
     def run_episode(self):
         steps = 0
@@ -29,10 +28,14 @@ class Simulation:
             reward = self.environment.perform_action(action)
             state_after = self.environment.get_actor_state()
             self.strategy.update(state_before, action, reward, state_after)
-            total_reward += reward
-            steps += 1
+            total_reward = total_reward + reward
+            steps = steps + 1
+
+        self.environment.reset()
+
+        print('{0}:{1}'.format(str(steps), str(total_reward)))
 
         return steps, total_reward
 
     def save_to_file(self, strategy):
-        pass
+        print(strategy.dump())

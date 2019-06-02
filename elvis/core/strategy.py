@@ -5,6 +5,13 @@ from .eligibility_traces import EligibilityTraces
 class Strategy:
 
     def __init__(self, y, a, l, e, e_decay):
+        """
+        @param y gamma decay factor
+        @param a alpha learning rate
+        @param l lambda
+        @param e epsilon for exploration
+        @param e_decay epsilon decay factor
+        """
         self.y = y
         self.a = a
         self.l = l
@@ -36,11 +43,11 @@ class Strategy:
         self.eligibility_traces.increment(state_before, action)
         self.q_values.ensure_exists(state_before, action)
 
-        def update_q_values(state, action):
-            old_expected_reward = self.q_values.get_expected_reward(state, action)
-            new_expected_reward = old_expected_reward + self.a * td_error * self.eligibility_traces.get(state, action)
-            self.q_values.set_expected_reward(state, action, new_expected_reward)
-            self.eligibility_traces.decay(state, action)
+        def update_q_values(state, act):
+            old_expected_reward = self.q_values.get_expected_reward(state, act)
+            new_expected_reward = old_expected_reward + self.a * td_error * self.eligibility_traces.get(state, act)
+            self.q_values.set_expected_reward(state, act, new_expected_reward)
+            self.eligibility_traces.decay(state, act)
 
         self.q_values.for_each(update_q_values)
         self.episode_reward += reward
@@ -50,3 +57,11 @@ class Strategy:
         self.e = values['e']
         self.scores = values['scores']
         self.episode = values['episode']
+
+    def dump(self):
+        return {
+            'q': self.q_values.get_all_values(),
+            'ε': self.e,
+            'scores': self.scores,
+            'episode': self.episode
+        }

@@ -1,35 +1,51 @@
-from elvis.utils import MapReader
-from .position import Position
+from .states import States
+
 
 class MiniMap:
 
-    def __init__(self, config):
-        reader = MapReader(config['map'])
-        building = reader.get_building(config['building'])
-        self.minimap = None
-        self.landmarks = None
-        for floors in building.floors:
-            if floors.number == config['floor']:
-                floor = floors
-                self.minimap = floor.minimap
-                self.landmarks = floor.landmarks
-
-        if self.landmarks is not None:
-            for landmark in self.landmarks:
-                if landmark.name == config['start-landmark']:
-                    self.start_position = Position(landmark.location.x, landmark.location.y)
-                elif landmark.name == config['end-landmark']:
-                    self.end_position = Position(landmark.location.x, landmark.location.y)
-
-
-    def get_start_position(self):
-        return self.start_position
-
-    def get_end_position(self):
-        return self.end_position
+    def __init__(self, tiles, height, width, start, end):
+        self.tiles = tiles
+        self.height = height
+        self.width = width
+        self.start = start
+        self.end = end
 
     def get_height(self):
-        return self.minimap.rows * self.minimap.sideSize
+        return self.height
 
     def get_width(self):
-        return self.minimap.columns * self.minimap.sideSize
+        return self.width
+
+    def get_start_position(self):
+        return self.start
+
+    def get_end_position(self):
+        return self.end
+
+    def __getitem__(self, key):
+        return self.tiles[key]
+
+    def get_content(self, position):
+        return self.tiles[position.y][position.x]
+
+    def set_content(self, position, content):
+        self.tiles[position.y][position.x] = content
+
+    def print(self):
+        for row in self.tiles[::-1]:
+            for column in row:
+                if column is States.EMPTY:
+                    print('.', end="")
+                elif column is States.BLOCKED:
+                    print('█', end="")
+                elif column is States.ACTOR:
+                    print('웃', end="")
+                elif column is States.END:
+                    print('X', end="")
+                elif column is States.LANDMARK:
+                    print('L', end="")
+            print()
+
+    def reset(self):
+        #self.set_content(self.start, States.ACTOR)
+        self.set_content(self.end, States.END)

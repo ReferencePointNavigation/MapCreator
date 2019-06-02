@@ -5,63 +5,59 @@ from .states import States
 
 class Environment:
 
-    def __init__(self, minimap, actor):
-        self.grid = minimap
+    def __init__(self, grid, actor):
+        self.grid = grid
         self.actor = actor
-        self.height = minimap.get_height()
-        self.width = minimap.get_width()
+        self.height = grid.get_height()
+        self.width = grid.get_width()
+
+    def get(self):
+        return self.grid.tiles[::-1]
 
     def actor_in_terminal_state(self):
         return self.actor.in_terminal_state()
 
     def get_actor_state(self):
-        return self.actor.get_state()
+        return self.actor.get_position()
 
     def __position_on_grid(self, pos):
         return (0 <= pos.x < self.width) and (0 <= pos.y < self.height)
 
     def perform_action(self, action):
+
         reward = 0
+        requested_location_contents = States.BLOCKED
 
         actor_requested_pos = self.actor.get_position().copy()
 
-        if action == Actions.ACTION_UP:
-            actor_requested_pos.up()
-
-        elif action == Actions.ACTION_RIGHT:
-            actor_requested_pos.right()
-
-        elif action == Actions.ACTION_DOWN:
-            actor_requested_pos.down()
-
-        elif action == Actions.ACTION_LEFT:
-            actor_requested_pos.left()
-
-        else:
-            assert False, 'action=' + str(action)
+        action.value(actor_requested_pos)
 
         if self.__position_on_grid(actor_requested_pos):
-            requested_location_contents = self.grid[actor_requested_pos.y][actor_requested_pos.x]
-        else:
-            requested_location_contents = States.BLOCKED
+            requested_location_contents = self.grid.get_content(actor_requested_pos)
 
         def move_actor_to_requested_location():
-            self.grid[self.actor_pos.y][self.actor_pos.x] = States.EMPTY
-            self.actor_pos = actor_requested_pos
-            self.grid[self.actor_pos.y][self.actor_pos.x] = States.ACTOR
+            actor_pos = self.actor.get_position()
+            self.grid.set_content(actor_pos, States.EMPTY)
+            self.actor.set_position(actor_requested_pos)
+            self.grid.set_content(actor_requested_pos, States.ACTOR)
 
         if requested_location_contents == States.BLOCKED:
             reward += Rewards.BAD_MOVE.value
 
         elif requested_location_contents == States.EMPTY:
-            reward += Rewards.MOVEMENT
+            reward += Rewards.MOVEMENT.value
             move_actor_to_requested_location()
 
-        elif requested_location_contents == States.EXIT:
-            reward += Rewards.MOVEMENT + Rewards.EXIT
+        elif requested_location_contents == States.END:
+            reward += Rewards.MOVEMENT.value + Rewards.EXIT.value
             move_actor_to_requested_location()
             self.actor.set_terminal_state(True)
             print("SUCCESS")
+
+        elif requested_location_contents == States.LANDMARK:
+            reward += Rewards.MOVEMENT.value
+            move_actor_to_requested_location()
+
 
         else:
             assert False, 'requested_location_contents=' + str(requested_location_contents)
@@ -72,3 +68,8 @@ class Environment:
 
     def __update_environment(self):
         pass
+
+    def reset(self):
+        self.grid.set_content(self.actor.get_position(), States.EMPTY)
+        self.actor.reset(self.grid.get_start_position())
+        self.grid.reset()

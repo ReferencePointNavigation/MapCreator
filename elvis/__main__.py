@@ -3,13 +3,18 @@ import signal
 import getopt
 import json
 import os
+from socketserver import TCPServer
+
+from .web_server import ElvisRequestHandler
 
 from elvis.core import (
     Simulation,
     Strategy,
     Actor,
-    Environment,
-    MiniMap)
+    Environment)
+
+from .utils import MapReader
+
 
 
 def print_help():
@@ -34,9 +39,10 @@ def main(argv):
     dir_path = os.path.dirname(os.path.realpath(__file__))
     config_file = os.path.join(dir_path, 'default.json')
     config = None
+    runweb = False
 
     try:
-        opts, args = getopt.getopt(argv, "h:c:", ["config="])
+        opts, args = getopt.getopt(argv, "h:c:w", ["config=", "web",""])
     except getopt.GetoptError:
         print_help()
         sys.exit(2)
@@ -46,6 +52,8 @@ def main(argv):
             sys.exit()
         elif opt in ("-c", "--config"):
             config_file = arg
+        elif opt in ("-w", "--web"):
+            runweb = True
 
     signal.signal(signal.SIGINT, save_and_exit)
 
@@ -57,13 +65,20 @@ def main(argv):
         exit(2)
 
     strategy = build_strategy()
-
-    grid = MiniMap(config)
-    actor = Actor()
+    reader = MapReader(config)
+    grid = reader.build_map()
+    actor = Actor(grid.get_start_position())
     environment = Environment(grid, actor)
-    simulation = Simulation(config, actor, strategy, environment)
 
-    simulation.run()
+    if runweb:
+        ElvisRequestHandler.environment = environment
+        ElvisRequestHandler.strategy = strategy
+        Handler = ElvisRequestHandler
+        server = TCPServer(('0.0.0.0', 8080), Handler)
+        server.serve_forever()
+    else:
+        simulation = Simulation(config, actor, strategy, environment)
+        simulation.run()
 
 
 if __name__ == '__main__':

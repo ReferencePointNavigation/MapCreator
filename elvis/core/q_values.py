@@ -1,8 +1,7 @@
-# -*- coding: utf-8 -*-
-
 from random import random, choice
 from .states_actions import StatesAndActions
 from .actions import Actions
+
 
 class QValues:
     def __init__(self):
@@ -20,14 +19,14 @@ class QValues:
 
     def get_greedy_action(self, state, e=0):
         if random() < e:
-            actions = [member for name, member in Actions.__members__.items()]
+            actions = Actions
 
         else:
             actions_for_state = self.values.get_all_for_state(state)
             max_val = max(actions_for_state.values())
             actions = [action for action, value in actions_for_state.items() if value == max_val]
 
-        return choice(actions)
+        return choice(list(actions))
 
     def set_all_values(self, values):
         self.values.set_all(values)

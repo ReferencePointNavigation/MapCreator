@@ -1,0 +1,27 @@
+#grid{
+    font-family: monospace;
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+#grid td {
+    width: 32px;
+    background-color: #ebebeb;
+    margin: 0;
+    height: 32px;
+}
+.cellStates_ACTOR {
+    background-image: url('images/elvis.png');
+    background-size: 100%;
+}
+.cellStates_LANDMARK {
+    background-image: url('images/landmark.png');
+    background-size: 100%;
+}
+
+.cellStates_END {
+    background-image: url('images/finish.png');
+    background-size: 100%;
+}
+.cellStates_BLOCKED {
+    background-color: black ! important;
+}

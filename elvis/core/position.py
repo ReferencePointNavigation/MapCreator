@@ -1,6 +1,6 @@
 
 class Position:
-    def __init__(self, x, y, stride=1.0):
+    def __init__(self, x, y, stride=1):
         self.x = x
         self.y = y
         self.stride = stride
@@ -28,3 +28,6 @@ class Position:
 
     def __repr__(self):
         return '{},{}'.format(self.x, self.y)
+
+    def __hash__(self):
+        return hash((self.x, self.y, self.stride))

@@ -15,10 +15,11 @@ class StatesAndActions:
         return DEFAULT_VALUE
 
     def get_all_for_state(self, state):
-        return {action: self.get(state, action) for action in [member for name, member in Actions.__members__.items()]}
+        return {action: self.get(state, action) for action in Actions}
 
     def get_all(self):
-        return copy.deepcopy(self.values)
+        return self.values
+        #return copy.deepcopy(self.values)
 
     def set_all(self, values):
         self.values = copy.deepcopy(values)
