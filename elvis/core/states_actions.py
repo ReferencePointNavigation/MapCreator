@@ -5,6 +5,9 @@ DEFAULT_VALUE = 0
 
 
 class StatesAndActions:
+    """
+    State Action pairs
+    """
     def __init__(self):
         self.values = {}
 
@@ -19,7 +22,6 @@ class StatesAndActions:
 
     def get_all(self):
         return self.values
-        #return copy.deepcopy(self.values)
 
     def set_all(self, values):
         self.values = copy.deepcopy(values)

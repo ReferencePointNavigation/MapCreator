@@ -4,10 +4,10 @@
     border-spacing: 0;
 }
 #grid td {
-    width: 32px;
+    width: 1em;
     background-color: #ebebeb;
     margin: 0;
-    height: 32px;
+    height: 1em;
 }
 .cellStates_ACTOR {
     background-image: url('images/elvis.png');

@@ -29,7 +29,7 @@ function init(){
     fetchJson('/init', env => {
         drawEnvironment(env);
         function move() {
-            fetchJson(`/move/${JSON.stringify(env)}`, response => {
+            fetchJson(`/move/`, response => {
                 env = response.env
                 drawEnvironment(env);
                 if (response.terminal) {

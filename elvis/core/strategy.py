@@ -4,36 +4,54 @@ from .eligibility_traces import EligibilityTraces
 
 class Strategy:
 
-    def __init__(self, y, a, l, e, e_decay):
+    def __init__(self, gamma, alpha, _lambda, epsilon, epsilon_decay):
         """
-        @param y gamma decay factor
-        @param a alpha learning rate
-        @param l lambda
-        @param e epsilon for exploration
-        @param e_decay epsilon decay factor
+        @param gamma discount-rate
+        @param alpha learning rate
+        @param _lambda decay-rate for eligibility traces
+        @param epsilon for e-greedy exploration
+        @param epsilon_decay epsilon decay factor
         """
-        self.y = y
-        self.a = a
-        self.l = l
-        self.e = e
-        self.e_decay = e_decay
+        self.y = gamma
+        self.a = alpha
+        self.l = _lambda
+        self.e = epsilon
+        self.e_decay = epsilon_decay
         self.eligibility_traces = None
         self.q_values = QValues()
-        self.scores = [] # TODO
         self.episode = 0
         self.episode_reward = 0
-        self.episode_reward_total = 0 # TODO
 
     def new_episode(self):
+        """
+        Start a new episode. This increments the episode counter and decays
+        the eligibility traces and epsilon values
+        :return:
+        """
         self.eligibility_traces = EligibilityTraces(1 - self.y * self.l)
         self.e *= self.e_decay
         self.episode += 1
         self.episode_reward = 0
 
     def next_action(self, state, e=None):
+        """
+        Choose the next action based on the e parameter or the e value the Strategy
+        was initialized with
+        :param state: the current actor state
+        :param e: the e-greedy value, default is None
+        :return: the next action
+        """
         return self.q_values.get_greedy_action(state, self.e if e is None else e)
 
     def update(self, state_before, action, reward, state_after):
+        """
+        Updates the expected value for the given state, action pairs
+        :param state_before: the current state of the actor
+        :param action: the action to take
+        :param reward: the actual reward for the action
+        :param state_after: the state of the actor after the action
+        :return: the TD Error
+        """
         expected_reward = self.q_values.get_expected_reward(state_before, action)
         next_action = self.q_values.get_greedy_action(state_after, self.e)
         next_expected_reward = self.q_values.get_expected_reward(state_after, next_action)
@@ -52,16 +70,16 @@ class Strategy:
         self.q_values.for_each(update_q_values)
         self.episode_reward += reward
 
-    def load(self, values):
-        self.q_values.set_all_values(values['q'])
-        self.e = values['e']
-        self.scores = values['scores']
-        self.episode = values['episode']
+        return td_error
 
-    def dump(self):
+    def snapshot(self):
+        """
+        Get a snapshot of the Strategy
+        :return: a dict containing the current Q Values, the epsilon value
+            and the current episode number
+        """
         return {
             'q': self.q_values.get_all_values(),
             'ε': self.e,
-            'scores': self.scores,
             'episode': self.episode
         }

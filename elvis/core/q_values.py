@@ -4,6 +4,9 @@ from .actions import Actions
 
 
 class QValues:
+    """
+    Q Function for Rewards based on the State Action pair
+    """
     def __init__(self):
         self.values = StatesAndActions()
 

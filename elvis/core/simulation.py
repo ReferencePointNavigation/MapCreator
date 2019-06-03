@@ -1,41 +1,50 @@
-MAX_EPISODE_STEPS = 1000
-
+import sys
 
 class Simulation:
-
+    """
+    The Simulation class encapsulates a full series of Episodes
+    """
     def __init__(self, config, actor, strategy, environment):
         self.config = config
         self.actor = actor
         self.strategy = strategy
         self.environment = environment
+        self.optimal = (sys.maxsize, -sys.maxsize, {})
 
     def run(self):
         for episode_index in range(self.config['episode-count']):
             steps, reward = self.run_episode()
-            if episode_index > 0 and episode_index % self.config['save-interval'] == 0:
-                self.save_to_file(self.strategy)
-                #print('{0}:{1} = {2}'.format(episode_index, steps, reward))
+            if steps < self.optimal[0] and reward > self.optimal[1]:
+                self.optimal = (steps, reward, self.strategy.snapshot())
+        print(self.optimal)
 
     def run_episode(self):
+        """
+        A single episode of the Simulation
+        :return: the total number of steps to reach the goal,
+            the total rewards for the episode
+        """
         steps = 0
         total_reward = 0
 
         self.strategy.new_episode()
 
-        while not self.environment.actor_in_terminal_state() and steps < MAX_EPISODE_STEPS:
-            state_before = self.environment.get_actor_state()
+        while not self.actor.in_terminal_state() and steps < self.config['episode-steps']:
+            state_before = self.actor.get_position()
             action = self.strategy.next_action(state_before)
             reward = self.environment.perform_action(action)
-            state_after = self.environment.get_actor_state()
+            state_after = self.actor.get_position()
             self.strategy.update(state_before, action, reward, state_after)
             total_reward = total_reward + reward
             steps = steps + 1
 
         self.environment.reset()
 
-        print('{0}:{1}'.format(str(steps), str(total_reward)))
-
         return steps, total_reward
 
-    def save_to_file(self, strategy):
-        print(strategy.dump())
+    def get_results(self):
+        """
+        Get the results of the simulation
+        :return: a Tuple (min(steps), max(reward), strategy)
+        """
+        return self.optimal
