@@ -1,7 +1,7 @@
 from PyQt5.QtCore import Qt
 from ui.qgs_widget import QgsWidget
 from .elvis_dock_widget import ElvisDockWidget
-from referencepoint import Topics
+
 
 class ElvisWidget(QgsWidget):
 
@@ -15,7 +15,7 @@ class ElvisWidget(QgsWidget):
 class ShowGuiWidget(ElvisWidget):
 
     def __init__(self, iface, elvis):
-        super().__init__(iface, 'elvis', u'Show ELVIS')
+        super().__init__(iface, elvis,'elvis', u'Show ELVIS')
         self.elvis = elvis
         self.setEnabled(False)
         self.setCheckable(True)
@@ -23,9 +23,9 @@ class ShowGuiWidget(ElvisWidget):
         self.dock_widget = ElvisDockWidget(self.elvis)
         self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dock_widget)
         self.dock_widget.show()
-        self.subscribe(self.map_created, Topics.MAP_CREATED)
+        self.controller.map_created.connect(self.map_created)
 
-    def map_created(self, arg1):
+    def map_created(self):
         self.setEnabled(True)
 
     def on_toggled(self, checked):

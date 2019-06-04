@@ -1,5 +1,6 @@
 import sys
 
+
 class Simulation:
     """
     The Simulation class encapsulates a full series of Episodes

@@ -7,18 +7,19 @@ from qgis.core import (
     QgsFeature,
     QgsGeometry,
     QgsPointXY,
-    QgsRectangle
+    QgsRectangle,
+    QgsPalLayerSettings,
+    QgsVectorLayerSimpleLabeling
 )
 
 import qgis.utils
-
-from pubsub import pub
-from referencepoint import Topics
+from PyQt5.QtCore import pyqtSignal, QObject
 
 
-class Layer(object):
+class Layer(QObject):
 
     def __init__(self, name, geom_type, crs):
+        super().__init__()
         self.crs = crs
         self.query = None
         self.new_count = 0
@@ -36,14 +37,22 @@ class Layer(object):
         path = '{0}?crs=epsg:{1}&field={2}'.format(geom_type, self.crs, '&field='.join(self.fields))
         self.layer = QgsVectorLayer(path, name, 'memory')
         self.layer.setDefaultValueDefinition(1, QgsDefaultValue('0'))
+        settings = QgsPalLayerSettings()
+        settings.fieldName = 'name'
+        labeling = QgsVectorLayerSimpleLabeling(settings)
+        self.layer.setLabeling(labeling)
+        self.layer.setLabelsEnabled(True)
         self.layer.committedFeaturesAdded.connect(self.on_feature_added)
+        self.node = None
 
     # overriden by subclasses
     def on_feature_added(self):
         pass
 
     def add_to_group(self, group):
-        return group.addLayer(self.layer)
+        self.node = group.addLayer(self.layer)
+        self.node.setCustomProperty("showFeatureCount", True)
+        return self.node
 
     def start_editing(self):
         self.layer.startEditing()
@@ -88,14 +97,6 @@ class Layer(object):
         self.crs = crs
         self.layer.setCrs(QgsCoordinateReferenceSystem(crs))
 
-    # noinspection PyMethodMayBeStatic
-    def publish(self, topic, arg1):
-        pub.sendMessage(topic.value, arg1=arg1)
-
-    # noinspection PyMethodMayBeStatic
-    def subscribe(self, listener, topic):
-        pub.subscribe(listener, topic.value)
-
 
 class LayerFactory:
 
@@ -138,7 +139,7 @@ class LandmarkLayer(Layer):
         self.fields = ['indoor:string(25)', 'type:integer']
         super().__init__(u'Landmarks', 'Point', crs)
 
-        self.subscribe(self.on_level_selected, Topics.LEVEL_SELECTED)
+        #self.subscribe(self.on_level_selected, Topics.LEVEL_SELECTED)
 
         self.layer.setEditorWidgetSetup(2,
             QgsEditorWidgetSetup("ValueMap",
@@ -168,10 +169,10 @@ class LandmarkLayer(Layer):
         self.layer.dataProvider().addFeatures([feature])
         return feature
 
-    def on_level_selected(self, arg1):
+    def set_level(self, level):
         self.layer.setSubsetString(None)
-        if arg1 is not None:
-            self.layer.setSubsetString('"level"=\'{}\''.format(arg1))
+        if level is not None:
+            self.layer.setSubsetString('"level"=\'{}\''.format(level))
         self.layer.updateExtents(True)
 
 
@@ -181,9 +182,11 @@ class PathLayer(Layer):
 
 
 class RoomLayer(Layer):
+
+    levels_changed = pyqtSignal()
+
     def __init__(self, crs):
         super().__init__(u'Rooms', 'Polygon', crs)
-        self.subscribe(self.on_level_selected, Topics.LEVEL_SELECTED)
 
     def add_feature(self, fields, geom):
         super().add_feature(fields, geom)
@@ -193,16 +196,16 @@ class RoomLayer(Layer):
             feature[name] = value
         feature.setGeometry(QgsGeometry.fromPolygonXY([points]))
         self.layer.dataProvider().addFeatures([feature])
-        self.publish(Topics.NEW_ROOM, int(fields['level']))
+        self.levels_changed.emit()
         return feature
 
     def on_feature_added(self):
-        self.publish(Topics.LEVELS_CHANGE, self.get_levels())
+        self.levels_changed.emit()
 
-    def on_level_selected(self, arg1):
+    def set_level(self, level):
         self.layer.setSubsetString(None)
-        if arg1 is not None:
-            self.layer.setSubsetString('"level"=\'{}\''.format(arg1))
+        if level is not None:
+            self.layer.setSubsetString('"level"=\'{}\''.format(level))
         self.layer.updateExtents(True)
 
     def get_levels(self, building=None):
@@ -215,6 +218,7 @@ class RoomLayer(Layer):
                 continue
             else:
                 levels.add(int(attr))
+
         return sorted(levels)
 
 

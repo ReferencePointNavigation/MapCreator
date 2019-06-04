@@ -5,3 +5,4 @@ from .toolbar import Toolbar
 from .project_widget import ProjectWidget
 from .tool_widget import ToolWidget
 from .display_widget import DisplayWidget
+from .layer_view import LayerView

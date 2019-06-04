@@ -15,8 +15,9 @@ import os
 
 from .referencepoint.map_builder import MapBuilder
 from .referencepoint.map_view import MapView
-from ui import LayerFactory, QgsMap, MiniMap, Toolbar
-from elvis import Elvis, ElvisToolbar
+from ui import LayerFactory, QgsMap, MiniMap, Toolbar, LayerView
+from elvis import Elvis
+from elvis.ui import ElvisToolbar
 
 import importlib
 importlib.import_module('ui')
@@ -27,7 +28,6 @@ from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction, QFileDialog, QDialog, QInputDialog, QLineEdit
 
-from qgis.core import QgsProject
 from qgis.utils import showPluginHelp
 import qgis.utils
 # Initialize Qt resources from file resources.py
@@ -59,17 +59,17 @@ class Plugin:
             if qVersion() > '4.3.3':
                 QCoreApplication.installTranslator(self.translator)
 
-
         # Declare instance attributes
         self.actions = []
         self.menu = self.tr(u'&Reference Point Map Builder')
 
-        self.toolbar = Toolbar(iface, u'Map Builder')
-        self.map = QgsMap(self.tr(u'Untitled'), LayerFactory(), QgsProject.instance())
-        self.view = MapView(self)
-        self.controller = MapBuilder(self.view, self.map)
+        self.map = QgsMap()
+        self.controller = MapBuilder(self.map, LayerFactory())
+        self.toolbar = Toolbar(iface, self.tr(u'Map Builder'), self.controller)
+        self.grid = MiniMap(self.iface.mapCanvas(), self.map)
+        self.view = MapView(iface, self.grid, self.controller)
+        self.layer_view = LayerView(self.iface, self.controller)
 
-        self.minimap = MiniMap(self.iface.mapCanvas(), self.map, 1.0)
         self.elvis = Elvis(self.map)
         self.elvis_toolbar = ElvisToolbar(self.iface, self.elvis)
 
@@ -176,19 +176,7 @@ class Plugin:
     def show_help(self):
         showPluginHelp()
 
-    def select_move_tool(self):
-        self.iface.actionMoveFeature().trigger()
-
-    def set_active_layer(self, layer):
-        self.iface.setActiveLayer(layer)
-
-    def set_add_feature(self):
-        self.iface.actionAddFeature().trigger()
-
     def unload(self):
-        """Disconnect the LayerChanged Signal"""
-        #self.iface.currentLayerChanged.disconnect()
-
         """Removes the plugin menu item and icon from QGIS GUI."""
         for action in self.actions:
             self.iface.removePluginMenu(
@@ -198,4 +186,8 @@ class Plugin:
         # remove the toolbar
         self.toolbar.unload()
         self.elvis_toolbar.unload()
-
+        del self.toolbar
+        del self.view
+        del self.controller
+        del self.map
+        del self.layer_view

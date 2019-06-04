@@ -27,7 +27,7 @@
     <item>
      <widget class="QGroupBox" name="groupBox">
       <property name="enabled">
-       <bool>false</bool>
+       <bool>true</bool>
       </property>
       <property name="maximumSize">
        <size>
@@ -42,7 +42,7 @@
        <item>
         <widget class="QComboBox" name="algorithm_select">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -52,7 +52,7 @@
     <item>
      <widget class="QGroupBox" name="simulation_group">
       <property name="enabled">
-       <bool>false</bool>
+       <bool>true</bool>
       </property>
       <property name="title">
        <string>Simulation</string>
@@ -61,7 +61,7 @@
        <item>
         <widget class="QComboBox" name="building_select">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="currentText">
           <string/>
@@ -71,21 +71,21 @@
        <item>
         <widget class="QComboBox" name="landmark_from_select">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
         </widget>
        </item>
        <item>
         <widget class="QComboBox" name="landmark_to_select">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
         </widget>
        </item>
        <item>
         <widget class="QPushButton" name="pushButton">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="text">
           <string>Reset</string>
@@ -95,7 +95,7 @@
        <item>
         <widget class="QPushButton" name="run_simulation_button">
          <property name="enabled">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="text">
           <string>Run Simulation</string>

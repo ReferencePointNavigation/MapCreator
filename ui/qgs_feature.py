@@ -57,6 +57,7 @@ class Floor:
         self.__landmarks = []
         self.__geom = None
         self.__layer = layer
+        self.grid = []
 
     def get_number(self):
         return self.__number
@@ -69,6 +70,7 @@ class Floor:
                 self.__geom = geom
             else:
                 self.__geom = self.__geom.combine(geom)
+        self.build_grid()
 
     def get_rooms(self):
         return self.__rooms
@@ -82,8 +84,11 @@ class Floor:
     def get_bounding_box(self):
         return self.__geom.boundingBox()
 
-    def get_grid(self, tile_size=1.0):
-        grid = []
+    def get_grid(self):
+        return self.grid
+
+    def build_grid(self, tile_size=1.0):
+        self.grid = []
         bbox = self.get_bounding_box()
         min_x = bbox.xMinimum()
         min_y = bbox.yMinimum()
@@ -103,13 +108,12 @@ class Floor:
                     (curr_x, curr_y + tile_size)
                 ]
                 if self.intersects(tile):
-                    grid.append(tile)
+                    self.grid.append(tile)
 
                 curr_x += tile_size
             curr_x = min_x
             curr_y += tile_size
 
-        return grid
 
     def intersects(self, geom):
         points = QgsGeometry.fromPolylineXY(

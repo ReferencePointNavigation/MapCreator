@@ -6,24 +6,18 @@ class QgsMap(QObject):
 
     map_created = pyqtSignal()
 
-    def __init__(self, name, layer_factory, project):
-        super().__init__()
-        self.name = name
-        self.layer_factory = layer_factory
-        self.project = project
-        self.layers = None
-        self.crs = 3857
-        self.basemap = layer_factory.get_base_map()
-        self.group = None
+    levels_changed = pyqtSignal()
 
-    def new_map(self, name):
-        self.project.clear()
-        self.basemap.show()
-        self.group = self.project.layerTreeRoot().insertGroup(0, name)
+    def __init__(self, name=u"Untitled"):
+        super().__init__()
+        self.layers = None
         self.name = name
-        self.layers = self.layer_factory.new_layers()
-        for layer in self.layers:
-            layer.add_to_group(self.group)
+        self.crs = 3857
+
+    def new_map(self, name, layers):
+        self.name = name
+        self.layers = layers
+        self.layers['rooms'].levels_changed.connect(lambda: self.levels_changed.emit())
         self.map_created.emit()
 
     def get_name(self):

@@ -1,13 +1,11 @@
 from PyQt5.QtGui import QPainter, QPen, QColor
 from qgis.gui import QgsMapCanvasItem
-from qgis.core import QgsProject, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsPointXY, qgsDoubleNear, QgsMessageLog
-from math import ceil
-from pubsub import pub
-from referencepoint.topics import Topics
+from qgis.core import QgsProject, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsPointXY, QgsRectangle
+
 
 class MiniMap(QgsMapCanvasItem):
 
-    def __init__(self, canvas, mmap, tile_size):
+    def __init__(self, canvas, mmap, tile_size=1.0):
         self.canvas = canvas
         QgsMapCanvasItem.__init__(self, canvas)
         self.setVisible(False)
@@ -23,20 +21,13 @@ class MiniMap(QgsMapCanvasItem):
 
         self.canvas.extentsChanged.connect(self.on_extents_changed)
 
-        pub.subscribe(self.on_show_minimap, Topics.SHOW_MINIMAP.value)
-        pub.subscribe(self.on_level_selected, Topics.LEVEL_SELECTED.value)
-
     def on_extents_changed(self):
         self.refresh()
 
     def refresh(self):
-        self.build_grid()
-        self.update()
+        if self.isVisible():
+            self.build_grid()
         self.updateCanvas()
-
-    def on_level_selected(self, arg1):
-        if arg1 is not None:
-            self.set_level(int(arg1))
 
     def on_show_minimap(self, arg1):
         self.set_enabled(arg1)
@@ -53,11 +44,19 @@ class MiniMap(QgsMapCanvasItem):
         if self.map.get_layers() is None:
             return
 
-        self.grid = []
-        for building in self.map.get_buildings(bbox=self.canvas.extent()):
+        extent = self.canvas.extent()
+        grid = []
+        for building in self.map.get_buildings(bbox=extent):
             floor = building.get_floor(self.level)
             if floor is not None:
-                self.grid += floor.get_grid()
+                grid += floor.get_grid()
+
+        self.grid = []
+        for tile in grid:
+            canvas_pt = self.toCanvasCoordinates(QgsPointXY(tile[3][0], tile[3][1]))
+            canvas_pt_max = self.toCanvasCoordinates(QgsPointXY(tile[1][0], tile[1][1]))
+            self.grid.append((canvas_pt.x(), canvas_pt.y(), canvas_pt_max.x() - canvas_pt.x(),
+                             canvas_pt_max.y() - canvas_pt.y()))
 
     def paint(self, painter, option=None, widget=None):
         painter.save()
@@ -65,13 +64,15 @@ class MiniMap(QgsMapCanvasItem):
         painter.setCompositionMode(QPainter.CompositionMode_Difference)
 
         scale_factor = painter.fontMetrics().xHeight() / 4
+
+        if scale_factor < 1.0:
+            return
+
         self.grid_pen.setWidth(int(scale_factor))
+
         painter.setPen(self.grid_pen)
 
         for tile in self.grid:
-            canvas_pt = self.toCanvasCoordinates(QgsPointXY(tile[3][0], tile[3][1]))
-            canvas_pt_max = self.toCanvasCoordinates(QgsPointXY(tile[1][0], tile[1][1]))
-            painter.drawRect(canvas_pt.x(), canvas_pt.y(), canvas_pt_max.x() - canvas_pt.x(),
-                             canvas_pt_max.y() - canvas_pt.y())
+            painter.drawRect(tile[0], tile[1], tile[2], tile[3])
 
         painter.restore()

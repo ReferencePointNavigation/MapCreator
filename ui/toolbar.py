@@ -3,17 +3,19 @@ from ui.qgs_widget import QgsWidget
 
 class Toolbar:
 
-    def __init__(self, iface, name):
+    def __init__(self, iface, name, controller):
         self.iface = iface
         self.toolbar = self.iface.addToolBar(name)
         self.toolbar.setObjectName(name)
         self.actions = []
+        self.controller = controller
+        self.controller.add_toolbar(self)
 
         grp = 0
         for group, class_list in QgsWidget.registry.items():
             grp += 1
             for cls in class_list:
-                self.add_action(cls(self.iface))
+                self.add_action(cls(self.iface, controller))
             if grp < len(QgsWidget.registry):
                 self.add_separator()
 

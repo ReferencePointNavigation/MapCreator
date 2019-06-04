@@ -26,6 +26,7 @@ class ElvisDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         self.setVisible(changed)
         if changed:
             self.add_buildings(self.elvis.get_buildings())
+        self.simulation_group.setEnabled(True)
 
     def on_building_select_activated(self, index):
         building = self.building_select.currentData().value
