@@ -62,7 +62,6 @@ class ElvisRequestHandler(SimpleHTTPRequestHandler):
                 'terminal' : ElvisRequestHandler.environment.actor_in_terminal_state(),
                 'stats' : {
                     'ε' : ElvisRequestHandler.strategy.e,
-                    'scores' : ElvisRequestHandler.strategy.scores,
                     'episode' : ElvisRequestHandler.strategy.episode
                 }
             }

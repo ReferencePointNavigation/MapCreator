@@ -120,7 +120,7 @@ class Landmark:
         self.y = y
 
     def get_particle_state(self):
-        pass
+        return ParticleState(self.x, self.y)
 
 
 class ParticleState:

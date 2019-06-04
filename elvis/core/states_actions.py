@@ -21,7 +21,7 @@ class StatesAndActions:
         return {action: self.get(state, action) for action in Actions}
 
     def get_all(self):
-        return self.values
+        return copy.deepcopy(self.values)
 
     def set_all(self, values):
         self.values = copy.deepcopy(values)

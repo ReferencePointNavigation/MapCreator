@@ -27,6 +27,9 @@ class MiniMap(QgsMapCanvasItem):
     def refresh(self):
         if self.isVisible():
             self.build_grid()
+            self.scene().update()
+        else:
+            self.grid = []
         self.updateCanvas()
 
     def on_show_minimap(self, arg1):
@@ -59,7 +62,6 @@ class MiniMap(QgsMapCanvasItem):
                              canvas_pt_max.y() - canvas_pt.y()))
 
     def paint(self, painter, option=None, widget=None):
-        painter.save()
         painter.setRenderHint(QPainter.Antialiasing)
         painter.setCompositionMode(QPainter.CompositionMode_Difference)
 
@@ -74,5 +76,3 @@ class MiniMap(QgsMapCanvasItem):
 
         for tile in self.grid:
             painter.drawRect(tile[0], tile[1], tile[2], tile[3])
-
-        painter.restore()

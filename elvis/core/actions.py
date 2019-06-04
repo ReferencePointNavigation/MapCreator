@@ -13,6 +13,7 @@ class FunctionProxy:
         return self.function(*args, **kwargs)
 
 
+
 class Actions(Enum):
     """
     The allowable actions
@@ -29,3 +30,6 @@ class Actions(Enum):
         :return: the enum member's name
         """
         return '<%s.%s>' % (self.__class__.__name__, self.name)
+
+    def __deepcopy__(self, memo):
+        return self
