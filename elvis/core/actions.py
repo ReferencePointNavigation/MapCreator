@@ -13,7 +13,6 @@ class FunctionProxy:
         return self.function(*args, **kwargs)
 
 
-
 class Actions(Enum):
     """
     The allowable actions

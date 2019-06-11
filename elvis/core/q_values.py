@@ -23,7 +23,6 @@ class QValues:
     def get_greedy_action(self, state, e=0):
         if random() < e:
             actions = Actions
-
         else:
             actions_for_state = self.values.get_all_for_state(state)
             max_val = max(actions_for_state.values())
