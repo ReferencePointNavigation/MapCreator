@@ -1,0 +1,39 @@
+# This file contains metadata for your plugin. Since 
+# version 2.0 of QGIS this is the proper way to supply 
+# information about a plugin. The old method of 
+# embedding metadata in __init__.py 
+# is no longer supported since version 2.0.
+
+# This file should be included when you package your plugin.# Mandatory items:
+
+[general]
+name=Reference Point Navigation Map Builder
+qgisMinimumVersion=3.0
+description=This plugin builds map files compatible with Reference Point Navigation
+version=0.2
+author=Chris Daley
+email=chebizarro@gmail.com
+
+about=This plugin builds map files compatible with Reference Point Navigation
+
+tracker=https://github.com/ReferencePointNavigation/MapCreator/issues
+repository=https://github.com/ReferencePointNavigation/MapCreator
+# End of mandatory metadata
+
+# Recommended items:
+
+# Uncomment the following line and add your changelog:
+# changelog=
+
+# Tags are comma separated with spaces allowed
+tags=python, indoor mapping
+
+homepage=https://github.com/ReferencePointNavigation/MapCreator
+category=Plugins
+icon=resources/logo.svg
+# experimental flag
+experimental=False
+
+# deprecated flag (applies to the whole plugin, not just a single version)
+deprecated=False
+

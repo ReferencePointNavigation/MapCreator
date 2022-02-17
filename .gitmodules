@@ -1,3 +1,0 @@
-[submodule "referencepoint/proto"]
-	path = referencepoint/proto
-	url = https://github.com/ReferencePointNavigation/protobuf.git

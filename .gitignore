@@ -3,3 +3,5 @@ maps
 *.pyc
 .idea
 .noseids
+*.zip
+.vscode
