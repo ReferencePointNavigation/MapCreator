@@ -1,3 +1,4 @@
+import math
 from PyQt5.QtGui import QPainter, QPen, QColor
 from qgis.gui import QgsMapCanvasItem
 from qgis.core import QgsProject, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsPointXY, QgsRectangle
@@ -58,8 +59,9 @@ class MiniMap(QgsMapCanvasItem):
         for tile in grid:
             canvas_pt = self.toCanvasCoordinates(QgsPointXY(tile[3][0], tile[3][1]))
             canvas_pt_max = self.toCanvasCoordinates(QgsPointXY(tile[1][0], tile[1][1]))
-            self.grid.append((canvas_pt.x(), canvas_pt.y(), canvas_pt_max.x() - canvas_pt.x(),
-                             canvas_pt_max.y() - canvas_pt.y()))
+            self.grid.append( math.ceil(canvas_pt.x()), math.ceil(canvas_pt.y()),
+                              math.ceil(canvas_pt_max.x() - canvas_pt.x()),
+                              math.ceil(canvas_pt_max.y() - canvas_pt.y()))
 
     def paint(self, painter, option=None, widget=None):
         painter.setRenderHint(QPainter.Antialiasing)
