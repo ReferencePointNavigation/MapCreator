@@ -1,4 +1,5 @@
 from qgis.core import (
+    Qgis,
     QgsVectorLayer,
     QgsFeatureRequest,
     QgsDefaultValue,
@@ -6,6 +7,7 @@ from qgis.core import (
     QgsEditorWidgetSetup,
     QgsFeature,
     QgsGeometry,
+    QgsMessageLog,
     QgsPointXY,
     QgsRectangle,
     QgsPalLayerSettings,
@@ -230,7 +232,7 @@ class BaseMapLayer:
             self.ol_plugin = qgis.utils.plugins['openlayers_plugin']
             self.layer_type = self.ol_plugin._olLayerTypeRegistry.getById(4)
         except KeyError:
-            pass
+            QgsMessageLog.logMessage("The OpenLayers plugin is not enabled, the base map will not be loaded", "RPN Map Builder", level=Qgis.Info )
 
     def show(self):
         if self.ol_plugin is not None:

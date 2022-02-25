@@ -8,10 +8,17 @@ from PyQt5.QtWidgets import (
 )
 
 class QgsWidget(QAction):
+    """The base class for all plugin QGIS widgets
+
+    This class encapsulates access to plugin resources and maintains
+    a registry of all derived subclasses
+    """
 
     RESOURCE_PATH = ':/plugins/map_builder/resources/'
+    """The path where all of the plugin's resources are located"""
 
     registry = {}
+    """The registry of all subclasses"""
 
     def __init__(self, iface, controller, icon, text):
         QAction.__init__(self,

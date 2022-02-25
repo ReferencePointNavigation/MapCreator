@@ -17,7 +17,9 @@ class QgsMap(QObject):
     def new_map(self, name, layers):
         self.name = name
         self.layers = layers
-        self.layers['rooms'].levels_changed.connect(lambda: self.levels_changed.emit())
+        self.layers['rooms'].levels_changed.connect(
+          lambda: self.levels_changed.emit()
+        )
         self.map_created.emit()
 
     def get_name(self):
