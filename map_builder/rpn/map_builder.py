@@ -1,9 +1,7 @@
-from rpn import MapImporter, MapExporter, MapReader, MapWriter
+from rpn import MapImporter, MapExporter, MapReader, MapWriter, constants
 from PyQt5.QtCore import pyqtSignal, QObject
 import os
 
-__3857__ = "EPSG:3857"
-__4326__ = "EPSG:4326"
 
 class MapBuilder(QObject):
     """
@@ -41,17 +39,17 @@ class MapBuilder(QObject):
         mapname, _ = os.path.splitext(os.path.basename(file))
         self.new_map(mapname)
         reader = MapReader(self.map, file)
-        self.map.set_crs(__4326__)
+        self.map.set_crs(constants.EPSG_4326)
         importer = MapImporter(self.map, reader)
         importer.import_map()
-        self.map.set_crs(__3857__)
+        self.map.set_crs(constants.EPSG_3857)
 
     def save_map(self, filepath):
         writer = MapWriter(self.map.get_name(), filepath)
-        self.map.set_crs(__4326__)
+        self.map.set_crs(constants.EPSG_4326)
         exporter = MapExporter(self.map, writer)
         exporter.export_map()
-        self.map.set_crs(__3857__)
+        self.map.set_crs(constants.EPSG_3857)
 
     def tool_selected(self, tool_name):
         if len(tool_name) > 0:

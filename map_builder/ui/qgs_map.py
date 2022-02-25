@@ -1,31 +1,65 @@
 from ui.qgs_feature import Building, Floor, Room, Landmark, Path
 from PyQt5.QtCore import pyqtSignal, QObject
-
+from rpn import constants
 
 class QgsMap(QObject):
+    """Encapsulates the current QGIS Map"""
 
     map_created = pyqtSignal()
+    """Emits an event when a new map is created"""
 
     levels_changed = pyqtSignal()
+    """Emits an event when the currently viewed level is changed"""
 
-    def __init__(self, name=u"Untitled"):
+    def __init__(self, name="Untitled"):
+        """Constructor.
+        :param name: The name of the Map, set to "Untitled" by default
+        :type name: str
+        """
         super().__init__()
         self.layers = None
         self.name = name
-        self.crs = "EPSG:3857"
+        # Set the Map's CRS to EPSG:3857 for display purposes
+        self.crs = constants.EPSG_3857
 
     def new_map(self, name, layers):
+        """Creates a new Map.
+        :param name: The name of the new Map
+        :type name: str
+        :param layers: a array containing layers for the new Map
+        :type layers: list
+        """
         self.name = name
         self.layers = layers
+        # Connected the levels_changed signal of the rooms layer
+        # to the levels_changed signal of the Map
         self.layers['rooms'].levels_changed.connect(
           lambda: self.levels_changed.emit()
         )
+        # Emit the map_created signal
         self.map_created.emit()
 
     def get_name(self):
+        """Getter for name property
+        
+        :returns: The Map's name.
+        :rtype: str
+        """
         return self.name
 
     def get_buildings(self, bbox=None):
+        """Returns all of the buildings in the Map.
+        :param bbox: The area containing the buildings,
+            the default is None (the whole map) 
+        :type name: QgsRectangle
+
+        :note: The building objects are created new everytime this method is
+            called. You should not store this value as it will not be updated
+            if the map is changed.
+
+        :returns: A list of buildings
+        :rtype: list
+        """
         if self.layers is None:
             return []
 

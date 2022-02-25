@@ -3,9 +3,9 @@
 /***************************************************************************
  Plugin
                                  A QGIS plugin
- This plugin builds a Reference Point Navigation map
+ This plugin provides tools to build a Reference Point Navigation map
                               -------------------
-        begin                : 2018-10-19
+        begin                : 2022-02-25
         git sha              : $Format:%H$
         copyright            : (C) 2019 by Chris Daley
         email                : chebizarro@gmail.com
@@ -65,6 +65,7 @@ class Plugin:
         self.actions = []
         self.menu = self.tr(u'&Reference Point Map Builder')
 
+        # Instantiate plugin UI objects
         self.map = QgsMap()
         self.controller = MapBuilder(self.map, LayerFactory())
         self.toolbar = Toolbar(iface, self.tr(u'Map Builder'), self.controller)
@@ -173,6 +174,7 @@ class Plugin:
         self.view.show()
 
     def show_help(self):
+        """Show the plugin's help pages"""
         showPluginHelp()
 
     def unload(self):
@@ -184,6 +186,8 @@ class Plugin:
             self.iface.removeToolBarIcon(action)
         # remove the toolbar
         self.toolbar.unload()
+        # delete the instances from memory, this is required as they are
+        # QObjects whose memory is allocated outside of Python
         del self.toolbar
         del self.view
         del self.controller
