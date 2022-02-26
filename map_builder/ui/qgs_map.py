@@ -27,7 +27,7 @@ class QgsMap(QObject):
         :param name: The name of the new Map
         :type name: str
         :param layers: a array containing layers for the new Map
-        :type layers: list
+        :type layers: list of Layer
         """
         self.name = name
         self.layers = layers
@@ -48,17 +48,17 @@ class QgsMap(QObject):
         return self.name
 
     def get_buildings(self, bbox=None):
-        """Returns all of the buildings in the Map.
+        """Get all of the buildings in the Map.
         :param bbox: The area containing the buildings,
             the default is None (the whole map) 
-        :type name: QgsRectangle
+        :type bbox: QgsRectangle
 
         :note: The building objects are created new everytime this method is
-            called. You should not store this value as it will not be updated
+            called. You should not store them as they will not be updated
             if the map is changed.
 
         :returns: A list of buildings
-        :rtype: list
+        :rtype: list of Building
         """
         if self.layers is None:
             return []
@@ -85,18 +85,43 @@ class QgsMap(QObject):
         return buildings
 
     def get_landmarks(self):
+        """Get all of the Landmarks in the Map not contained
+          within Buildings.
+
+        :returns: A list of Landmarks
+        :rtype: list of Landmark
+        """
         layer = self.layers['landmarks']
         query = '"indoor" = \'no\''
         return [Landmark(f, layer.fields) for f in layer.get_features(query=query)]
 
     def get_paths(self):
+        """Get all of the Paths in the Map.
+        :returns: A list of Paths
+        :rtype: list of Path
+        """
         layer = self.layers['paths']
         return [Path(layer, f) for f in layer.get_features()]
 
     def get_layers(self):
+        """Getter for the layers property.
+        :returns: A list of Layers
+        :rtype: list of Layer
+        """
         return self.layers
 
     def add_feature(self, layer, fields, geom):
+        """Adds a feature to the Map.
+        :param layer: The Layer to add the feature to 
+        :type layer: Layer
+        :param fields: The Fields to add to the new feature (must be
+          supported by the layer) 
+        :type fields: dict of (str, str)
+        :param geom: The geometry of the feature 
+        :type geom: list of ()
+        :returns: The new feature
+        :rtype: QgsFeature
+        """
         return self.layers[layer].add_feature(fields, geom)
 
     def set_crs(self, crs):
