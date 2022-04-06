@@ -1,0 +1,17 @@
+<RCC>
+    <qresource prefix="/plugins/map_builder" >
+        <file>resources/building.svg</file>
+        <file>resources/elvis.svg</file>
+        <file>resources/export.svg</file>
+        <file>resources/import.svg</file>
+        <file>resources/floors.svg</file>
+        <file>resources/floor.svg</file>
+        <file>resources/grid.svg</file>
+        <file>resources/landmark.svg</file>
+        <file>resources/logo.svg</file>
+        <file>resources/move.svg</file>
+        <file>resources/new.svg</file>
+        <file>resources/path.svg</file>
+        <file>resources/json.svg</file>
+    </qresource>
+</RCC>

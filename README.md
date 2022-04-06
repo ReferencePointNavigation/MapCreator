@@ -1,3 +1,1 @@
-# MapCreator
-
-A collection of Python scripts for manipulating InvisiSign map files
+# Reference Point Navigation MapBuilder Plugin for QGis

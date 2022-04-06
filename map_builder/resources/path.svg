@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   version="1.1"
+   x="0px"
+   y="0px"
+   viewBox="0 0 85 85"
+   enable-background="new 0 0 100 100"
+   xml:space="preserve"
+   id="svg1158"
+   width="85"
+   height="85"><metadata
+     id="metadata1164"><rdf:RDF><cc:Work
+         rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title><dc:creator><cc:Agent><dc:title>Lluisa Iborra</dc:title></cc:Agent></dc:creator><dc:publisher><cc:Agent><dc:title>The Noun Project</dc:title></cc:Agent></dc:publisher></cc:Work></rdf:RDF></metadata><defs
+     id="defs1162" /><path
+     style="fill:#72808a;fill-opacity:1;stroke-width:6.53846121"
+     id="path2205"
+     d="m 65.384615,0 v 19.615385 h 6.538462 v 3.26923 c 0,9.010001 -7.329615,16.346154 -16.346153,16.346154 H 52.307692 V 32.692308 H 32.692307 v 6.538461 h -3.269231 c -12.619229,0 -22.8846135,10.265384 -22.8846135,22.884616 v 3.269231 H 0 V 85 H 19.615385 V 65.384616 h -6.538461 v -3.269231 c 0,-9.01654 7.336153,-16.346155 16.346152,-16.346155 h 3.269231 v 6.538462 H 52.307692 V 45.76923 h 3.269232 c 12.619229,0 22.884615,-10.265384 22.884615,-22.884615 v -3.26923 H 85 V 0 Z" /></svg>
