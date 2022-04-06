@@ -178,7 +178,7 @@ class MapExporter:
                 )
 
                 if MapExporter.__is_accessible([
-                            ((tile[0][0] + tile[2][1]) / 2, (tile[0][0] + tile[2][1])/2),
+                            (tile[0][0], tile[0][1]),
                             (landmark.particles[0].x, landmark.particles[0].y)
                         ], floor):
                     ordered_landmark = (distance, index)
@@ -200,8 +200,8 @@ class MapExporter:
             if not floor.contains(coord):
                 return False
             # Does line intersect the boundaries of navigableArea?
-            if floor.intersects(coord):
-                return False
+            # if floor.intersects(coord):
+                #return False
         # If none of the above, return True
         return True
 

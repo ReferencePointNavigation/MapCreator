@@ -56,7 +56,7 @@ class JSONWriter(MapWriter):
 
     def add_map(self, map_data):
         self.f = open(os.path.join(self.filepath, self.filename) + '.json', 'w')
-        self.f.write('"map" : \n{{\n "{}" : {}'.format(self.filename, MessageToJson(map_data)))
+        self.f.write('"map" : {{\n "{}" : {}'.format(self.filename, MessageToJson(map_data)))
 
     def add_building(self, building_name, building):
         if self.f is not None:

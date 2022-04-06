@@ -22,6 +22,11 @@ class MiniMap(QgsMapCanvasItem):
 
         self.canvas.extentsChanged.connect(self.on_extents_changed)
 
+        self.map.levels_changed.connect(self.level_changed)
+
+    def level_changed(self):
+      self.set_level(self.map.get_level())
+
     def on_extents_changed(self):
         self.refresh()
 
@@ -59,9 +64,9 @@ class MiniMap(QgsMapCanvasItem):
         for tile in grid:
             canvas_pt = self.toCanvasCoordinates(QgsPointXY(tile[3][0], tile[3][1]))
             canvas_pt_max = self.toCanvasCoordinates(QgsPointXY(tile[1][0], tile[1][1]))
-            self.grid.append( math.ceil(canvas_pt.x()), math.ceil(canvas_pt.y()),
+            self.grid.append([math.ceil(canvas_pt.x()), math.ceil(canvas_pt.y()),
                               math.ceil(canvas_pt_max.x() - canvas_pt.x()),
-                              math.ceil(canvas_pt_max.y() - canvas_pt.y()))
+                              math.ceil(canvas_pt_max.y() - canvas_pt.y())])
 
     def paint(self, painter, option=None, widget=None):
         painter.setRenderHint(QPainter.Antialiasing)

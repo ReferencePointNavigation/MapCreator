@@ -103,6 +103,9 @@ class QgsMap(QObject):
         layer = self.layers['paths']
         return [Path(layer, f) for f in layer.get_features()]
 
+    def get_level(self):
+        return self.layers['rooms'].get_level()
+
     def get_layers(self):
         """Getter for the layers property.
         :returns: A list of Layers

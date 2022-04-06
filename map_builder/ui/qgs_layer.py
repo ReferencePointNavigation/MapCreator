@@ -189,6 +189,7 @@ class RoomLayer(Layer):
 
     def __init__(self, crs):
         super().__init__(u'Rooms', 'Polygon', crs)
+        self.level = 0
 
     def add_feature(self, fields, geom):
         super().add_feature(fields, geom)
@@ -208,7 +209,11 @@ class RoomLayer(Layer):
         self.layer.setSubsetString(None)
         if level is not None:
             self.layer.setSubsetString('"level"=\'{}\''.format(level))
+        self.level = level
         self.layer.updateExtents(True)
+
+    def get_level(self):
+        return self.level
 
     def get_levels(self, building=None):
         features = self.layer.getFeatures() if building is None else self.layer.getFeatures(building)

@@ -1,7 +1,9 @@
 from qgis.core import (
     QgsFeature,
     QgsGeometry,
-    QgsPointXY
+    QgsPointXY,
+    QgsMessageLog,
+    Qgis
 )
 
 from math import ceil
@@ -118,7 +120,7 @@ class Floor:
     def intersects(self, geom):
         points = QgsGeometry.fromPolylineXY(
             [QgsPointXY(p[0], p[1]) for p in geom])
-        valid = self.__geom.intersects(points)
+        valid = points.intersects(self.__geom)
         return valid
 
     def contains(self, geom):
