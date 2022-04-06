@@ -1,3 +1,4 @@
+from map_builder.rpn import constants
 from ui.qgs_widget import QgsWidget, FileManagerMixin
 from qgis.utils import showPluginHelp
 
@@ -60,3 +61,14 @@ class ExportMapWidget(ProjectWidget):
         if filepath is not None:
             self.controller.save_map(filepath)
 
+
+class ExportJSONWidget(ProjectWidget):
+
+    def __init__(self, iface, controller):
+        super().__init__(iface, controller, 'json', u'Export Reference Point Map as JSON')
+
+    def action(self):
+        title = self.translate(u'Select Directory')
+        filepath = self.show_save_folder_dialog(title)
+        if filepath is not None:
+            self.controller.save_map(filepath, constants.JSON_FORMAT)

@@ -1,3 +1,4 @@
+from map_builder.rpn.map_writer import JSONWriter, RPNWriter
 from rpn import MapImporter, MapExporter, MapReader, MapWriter, constants
 from PyQt5.QtCore import pyqtSignal, QObject
 import os
@@ -44,8 +45,9 @@ class MapBuilder(QObject):
         importer.import_map()
         self.map.set_crs(constants.EPSG_3857)
 
-    def save_map(self, filepath):
-        writer = MapWriter(self.map.get_name(), filepath)
+    def save_map(self, filepath, format = constants.RPN_FORMAT):
+        map_name = self.map.get_name()
+        writer = JSONWriter(map_name, filepath) if format is constants.JSON_FORMAT else RPNWriter(map_name, filepath)
         self.map.set_crs(constants.EPSG_4326)
         exporter = MapExporter(self.map, writer)
         exporter.export_map()

@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/plugins/map_builder" >
-        <file>icon.png</file>
         <file>resources/building.svg</file>
         <file>resources/elvis.svg</file>
         <file>resources/export.svg</file>
@@ -13,5 +12,6 @@
         <file>resources/move.svg</file>
         <file>resources/new.svg</file>
         <file>resources/path.svg</file>
+        <file>resources/json.svg</file>
     </qresource>
 </RCC>

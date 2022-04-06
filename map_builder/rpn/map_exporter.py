@@ -47,8 +47,7 @@ class MapExporter:
                 point = map_proto.buildings[building.get_name()].vertices.add()
                 point.x = points.x()
                 point.y = points.y()
-            bldg = MapExporter.__export_buildings(building)
-            buildings[building.get_name()] = bldg.SerializeToString()
+            buildings[building.get_name()] = MapExporter.__export_buildings(building)
 
         for landmark in self.map.get_landmarks():
             lm = map_proto.landmarks.add()
@@ -61,7 +60,7 @@ class MapExporter:
         #for path in self.map.get_paths():
             #p = map_proto.paths.add()
 
-        self.writer.add_map(map_proto.SerializeToString())
+        self.writer.add_map(map_proto)
 
         for name, building in buildings.items():
             self.writer.add_building(name, building)
